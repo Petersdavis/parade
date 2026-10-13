@@ -42,3 +42,23 @@
   color: var(--color-fg);
   text-decoration: none;
 }
+
+.authAction {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-muted);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.authAction:hover:not(:disabled) {
+  color: var(--color-fg);
+}
+
+.authAction:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

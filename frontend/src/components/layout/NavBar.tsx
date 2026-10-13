@@ -1,4 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import { useAuth } from "@/components/auth/AuthProvider";
+import { signOutUser } from "@/lib/auth";
 
 import styles from "./NavBar.module.css";
 
@@ -8,6 +15,20 @@ const links = [
 ];
 
 export function NavBar() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const [signingOut, setSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    try {
+      await signOutUser();
+      router.push("/");
+    } finally {
+      setSigningOut(false);
+    }
+  }
+
   return (
     <header className={styles.header}>
       <nav className={styles.nav} aria-label="Primary">
@@ -20,6 +41,28 @@ export function NavBar() {
               <Link href={link.href}>{link.label}</Link>
             </li>
           ))}
+          {!loading && user ? (
+            <li>
+              <button
+                type="button"
+                className={styles.authAction}
+                onClick={handleSignOut}
+                disabled={signingOut}
+              >
+                {signingOut ? "Signing out…" : "Sign out"}
+              </button>
+            </li>
+          ) : null}
+          {!loading && !user ? (
+            <>
+              <li>
+                <Link href="/login">Sign in</Link>
+              </li>
+              <li>
+                <Link href="/register">Register</Link>
+              </li>
+            </>
+          ) : null}
         </ul>
       </nav>
     </header>

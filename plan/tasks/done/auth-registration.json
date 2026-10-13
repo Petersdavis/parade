@@ -1,0 +1,23 @@
+{
+  "id": "auth-registration",
+  "title": "User registration (email/password + OAuth)",
+  "phase": "step-1-auth",
+  "status": "pending",
+  "requirements": [
+    "Implement email/password sign-up and sign-in using Firebase Auth.",
+    "Support at least one OAuth provider (Google and/or Apple).",
+    "Validate inputs client-side and surface clear error messages.",
+    "Create a user profile document on first sign-up.",
+    "Cover the flow with component tests."
+  ],
+  "context": [
+    "frontend/src/app/(auth)/register/page.tsx",
+    "frontend/src/app/(auth)/login/page.tsx",
+    "frontend/src/components/auth/**",
+    "frontend/src/lib/auth.ts"
+  ],
+  "depends_on": [
+    "frontend-bootstrap"
+  ],
+  "notes": "Done. Implemented email/password sign-up + sign-in and Google OAuth using the Firebase client SDK, plus profile-document creation on first sign-up.\n\nNew files:\n- frontend/src/lib/auth.ts — Firebase Auth helpers: signUpWithEmail, signInWithEmail, signInWithGoogle, signOutUser, subscribeToAuthState, ensureUserProfile (idempotent users/{uid} doc creation via getDoc+setDoc merge), and getAuthErrorMessage (maps Firebase error codes to friendly copy).\n- frontend/src/lib/validation.ts — pure client-side validators (email, password >=8, display name, confirm-password) + validateRegisterForm/validateLoginForm returning a field->error map.\n- frontend/src/components/auth/AuthProvider.tsx — React context exposing { user, loading } via onAuthStateChanged; wired into frontend/src/app/layout.tsx.\n- frontend/src/components/auth/FormField.tsx (+ .module.css) — labelled input with aria-invalid/aria-describedby error messaging.\n- frontend/src/components/auth/OAuthButtons.tsx (+ .module.css) — Google button (Apple-ready layout).\n- frontend/src/components/auth/AuthForm.module.css — shared form/divider/alert/footer styles.\n- frontend/src/app/(auth)/register/page.tsx and frontend/src/app/(auth)/login/page.tsx — client components with inline validation, friendly error alerts, and redirect home on success.\n- Updated frontend/src/components/layout/NavBar.tsx (+ .module.css) to show Sign in/Register when signed out and Sign out when signed in.\n\nSecurity: added a users/{userId} rule to firestore.rules (owner-only read/write, uid must match doc id) while leaving the existing permissive catch-all in place.\n\nTests: added Vitest + Testing Library (vitest.config.ts, vitest.setup.ts, test/test:watch scripts, devDeps). 30 tests across 4 files: validation unit tests, auth error-mapping tests, and component tests for the register and login pages (validation errors, successful submit + redirect, friendly failure messages, Google OAuth).\n\nConfig: created frontend/.env.local with the parade-dev Firebase web config (gitignored).\n\nVerified: npm run typecheck, lint, format:check, build (static export emits /login and /register), and test (30 passing) all succeed.\n\nFollow-ups: (1) enable Google as a sign-in provider in the Firebase console for parade-dev; (2) add NEXT_PUBLIC_FIREBASE_* to CI/repo secrets for deploy builds; (3) consider an (auth)/layout.tsx for a shared centered auth layout."
+}
