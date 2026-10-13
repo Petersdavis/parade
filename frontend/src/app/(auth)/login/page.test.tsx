@@ -4,12 +4,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import LoginPage from "./page";
 
-const push = vi.fn();
+const replace = vi.fn();
 const signInWithEmail = vi.fn();
 const signInWithGoogle = vi.fn();
+const useAuth = vi.fn();
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push }),
+  useRouter: () => ({ replace }),
+}));
+
+vi.mock("@/components/auth/AuthProvider", () => ({
+  useAuth: () => useAuth(),
 }));
 
 vi.mock("@/lib/auth", async () => {
@@ -23,9 +28,12 @@ vi.mock("@/lib/auth", async () => {
 
 describe("LoginPage", () => {
   beforeEach(() => {
-    push.mockReset();
+    replace.mockReset();
     signInWithEmail.mockReset();
     signInWithGoogle.mockReset();
+    useAuth.mockReset();
+    // Default: signed out, auth state resolved.
+    useAuth.mockReturnValue({ user: null, loading: false });
   });
 
   it("renders the login form", () => {
@@ -46,7 +54,7 @@ describe("LoginPage", () => {
     expect(signInWithEmail).not.toHaveBeenCalled();
   });
 
-  it("submits valid credentials and redirects home", async () => {
+  it("submits valid credentials and lets the auth listener redirect", async () => {
     const user = userEvent.setup();
     signInWithEmail.mockResolvedValue({ user: { uid: "abc" } });
     render(<LoginPage />);
@@ -58,7 +66,22 @@ describe("LoginPage", () => {
     await waitFor(() => {
       expect(signInWithEmail).toHaveBeenCalledWith("jane@example.com", "longenough");
     });
-    expect(push).toHaveBeenCalledWith("/");
+    // The redirect is driven by auth state, not an imperative push.
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it("redirects home once the auth state reports a signed-in user", () => {
+    useAuth.mockReturnValue({ user: { uid: "abc" }, loading: false });
+    render(<LoginPage />);
+
+    expect(replace).toHaveBeenCalledWith("/");
+  });
+
+  it("does not redirect while auth state is still loading", () => {
+    useAuth.mockReturnValue({ user: null, loading: true });
+    render(<LoginPage />);
+
+    expect(replace).not.toHaveBeenCalled();
   });
 
   it("surfaces a friendly message when sign-in fails", async () => {
@@ -71,10 +94,10 @@ describe("LoginPage", () => {
     await user.click(screen.getByRole("button", { name: /^sign in$/i }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(/incorrect email or password/i);
-    expect(push).not.toHaveBeenCalled();
+    expect(replace).not.toHaveBeenCalled();
   });
 
-  it("signs in with Google and redirects home", async () => {
+  it("signs in with Google and lets the auth listener redirect", async () => {
     const user = userEvent.setup();
     signInWithGoogle.mockResolvedValue({ user: { uid: "abc" } });
     render(<LoginPage />);
@@ -82,6 +105,6 @@ describe("LoginPage", () => {
     await user.click(screen.getByRole("button", { name: /continue with google/i }));
 
     await waitFor(() => expect(signInWithGoogle).toHaveBeenCalled());
-    expect(push).toHaveBeenCalledWith("/");
+    expect(replace).not.toHaveBeenCalled();
   });
 });

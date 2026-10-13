@@ -85,6 +85,21 @@ export async function ensureUserProfile(user: User): Promise<void> {
   });
 }
 
+/**
+ * Best-effort profile provisioning.
+ *
+ * A failure here (e.g. Firestore not provisioned, rules not yet deployed) must
+ * never block authentication or the post-login redirect. We log and swallow the
+ * error so the auth flow stays resilient; the profile can be reconciled later.
+ */
+async function ensureUserProfileSafely(user: User): Promise<void> {
+  try {
+    await ensureUserProfile(user);
+  } catch (error) {
+    console.error("Failed to provision user profile document", error);
+  }
+}
+
 /** Sign up with email + password, then create the profile document. */
 export async function signUpWithEmail(
   email: string,
@@ -97,14 +112,14 @@ export async function signUpWithEmail(
     await updateProfile(credential.user, { displayName });
   }
 
-  await ensureUserProfile(credential.user);
+  await ensureUserProfileSafely(credential.user);
   return credential;
 }
 
 /** Sign in with email + password, ensuring a profile document exists. */
 export async function signInWithEmail(email: string, password: string): Promise<UserCredential> {
   const credential = await signInWithEmailAndPassword(auth(), email, password);
-  await ensureUserProfile(credential.user);
+  await ensureUserProfileSafely(credential.user);
   return credential;
 }
 
@@ -115,7 +130,7 @@ export async function signInWithGoogle(): Promise<UserCredential> {
   provider.setCustomParameters({ prompt: "select_account" });
 
   const credential = await signInWithPopup(auth(), provider);
-  await ensureUserProfile(credential.user);
+  await ensureUserProfileSafely(credential.user);
   return credential;
 }
 

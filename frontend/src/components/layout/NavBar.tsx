@@ -23,7 +23,7 @@ export function NavBar() {
     setSigningOut(true);
     try {
       await signOutUser();
-      router.push("/");
+      router.replace("/login");
     } finally {
       setSigningOut(false);
     }

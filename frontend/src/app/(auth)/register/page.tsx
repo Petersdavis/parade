@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
+import { useAuth } from "@/components/auth/AuthProvider";
 import { FormField } from "@/components/auth/FormField";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import formStyles from "@/components/auth/AuthForm.module.css";
@@ -14,6 +15,7 @@ import { isValid, validateRegisterForm, type FieldErrors } from "@/lib/validatio
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { user, loading } = useAuth();
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +23,16 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Reactively redirect once a user is signed in. This covers the post-submit
+  // case, OAuth sign-in, and visiting /register while already authenticated —
+  // and does not depend on the imperative push winning a race with the auth
+  // listener (which is unreliable on a static export).
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/");
+    }
+  }, [loading, user, router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,10 +47,10 @@ export default function RegisterPage() {
     setSubmitting(true);
     try {
       await signUpWithEmail(email.trim(), password, displayName.trim());
-      router.push("/");
+      // The auth listener above performs the redirect; keep the button in its
+      // pending state until navigation occurs.
     } catch (error) {
       setFormError(getAuthErrorMessage(error));
-    } finally {
       setSubmitting(false);
     }
   }
@@ -98,7 +110,7 @@ export default function RegisterPage() {
 
         <div className={formStyles.divider}>or</div>
 
-        <OAuthButtons onSuccess={() => router.push("/")} onError={setFormError} />
+        <OAuthButtons onError={setFormError} />
 
         <p className={formStyles.footer}>
           Already have an account? <Link href="/login">Sign in</Link>
