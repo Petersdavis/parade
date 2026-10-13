@@ -1,0 +1,23 @@
+{
+  "id": "auth-identity-verification",
+  "title": "Identity verification (ID upload + background check)",
+  "phase": "step-1-auth",
+  "status": "pending",
+  "requirements": [
+    "Allow users to upload government ID to Firebase Storage with signed URLs.",
+    "Integrate a background-check provider (e.g. Checkr/Persona) via a Firebase Function.",
+    "Store verification status on the user document; never store raw ID data in Firestore.",
+    "Enforce retention and deletion policy for uploaded documents.",
+    "Expose verification status in the UI."
+  ],
+  "context": [
+    "frontend/src/app/(auth)/verify-identity/page.tsx",
+    "functions/src/identity/**",
+    "frontend/src/components/auth/**"
+  ],
+  "depends_on": [
+    "auth-email-verification",
+    "infra-firebase-project"
+  ],
+  "notes": ""
+}

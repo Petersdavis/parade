@@ -1,0 +1,21 @@
+{
+  "id": "messaging-realtime-chat",
+  "title": "Real-time chat via Firestore listeners",
+  "phase": "step-4-messaging",
+  "status": "pending",
+  "requirements": [
+    "Implement real-time messaging using Firestore onSnapshot listeners.",
+    "Use the conversations/messages data model defined in the README.",
+    "Enforce security rules so only participants can read/write.",
+    "Handle reconnection and offline states."
+  ],
+  "context": [
+    "frontend/src/app/(app)/messages/[conversationId]/page.tsx",
+    "frontend/src/lib/chat.ts",
+    "firestore.rules"
+  ],
+  "depends_on": [
+    "matching-mutual-detection"
+  ],
+  "notes": ""
+}

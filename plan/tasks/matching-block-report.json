@@ -1,0 +1,20 @@
+{
+  "id": "matching-block-report",
+  "title": "Block and report functionality",
+  "phase": "step-3-matching",
+  "status": "pending",
+  "requirements": [
+    "Allow users to block and report other profiles.",
+    "Exclude blocked users from search and discovery.",
+    "Route reports to a moderation queue.",
+    "Confirm actions and allow unblocking."
+  ],
+  "context": [
+    "frontend/src/components/moderation/**",
+    "functions/src/moderation/**"
+  ],
+  "depends_on": [
+    "matching-discovery"
+  ],
+  "notes": ""
+}

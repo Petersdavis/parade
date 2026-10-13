@@ -1,0 +1,20 @@
+{
+  "id": "messaging-icebreakers",
+  "title": "Optional icebreaker prompts",
+  "phase": "step-4-messaging",
+  "status": "pending",
+  "requirements": [
+    "Offer optional icebreaker prompts to start conversations.",
+    "Allow inserting a prompt as the first message.",
+    "Keep prompts configurable and non-intrusive.",
+    "Track usage for product insight."
+  ],
+  "context": [
+    "frontend/src/components/messaging/Icebreakers.tsx",
+    "shared/data/icebreakers.ts"
+  ],
+  "depends_on": [
+    "messaging-realtime-chat"
+  ],
+  "notes": ""
+}

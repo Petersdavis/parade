@@ -1,0 +1,20 @@
+{
+  "id": "profile-children-pets",
+  "title": "Children and pets details",
+  "phase": "step-2-profile",
+  "status": "pending",
+  "requirements": [
+    "Capture number of children and their ages.",
+    "Capture current pets and types.",
+    "Validate inputs and store on the profile document.",
+    "Index these fields for matching."
+  ],
+  "context": [
+    "frontend/src/components/profile/ChildrenPets.tsx",
+    "shared/types/profile.ts"
+  ],
+  "depends_on": [
+    "profile-schema"
+  ],
+  "notes": ""
+}

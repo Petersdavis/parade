@@ -1,0 +1,21 @@
+{
+  "id": "auth-email-verification",
+  "title": "Email verification flow",
+  "phase": "step-1-auth",
+  "status": "pending",
+  "requirements": [
+    "Send a verification email on registration via Firebase Auth.",
+    "Gate protected routes until the email is verified.",
+    "Provide a resend-verification action with rate limiting.",
+    "Show clear status messaging to the user."
+  ],
+  "context": [
+    "frontend/src/app/(auth)/verify-email/page.tsx",
+    "frontend/src/components/auth/**",
+    "frontend/src/lib/auth.ts"
+  ],
+  "depends_on": [
+    "auth-registration"
+  ],
+  "notes": ""
+}

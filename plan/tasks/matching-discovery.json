@@ -1,0 +1,20 @@
+{
+  "id": "matching-discovery",
+  "title": "Swipe or browse-style profile discovery",
+  "phase": "step-3-matching",
+  "status": "pending",
+  "requirements": [
+    "Implement swipe or browse discovery with smooth interactions.",
+    "Preload the next profiles for responsiveness.",
+    "Handle empty and error states gracefully.",
+    "Be responsive on mobile and desktop."
+  ],
+  "context": [
+    "frontend/src/app/(app)/discover/page.tsx",
+    "frontend/src/components/discovery/**"
+  ],
+  "depends_on": [
+    "matching-search-ui"
+  ],
+  "notes": ""
+}

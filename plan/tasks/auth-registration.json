@@ -1,0 +1,23 @@
+{
+  "id": "auth-registration",
+  "title": "User registration (email/password + OAuth)",
+  "phase": "step-1-auth",
+  "status": "pending",
+  "requirements": [
+    "Implement email/password sign-up and sign-in using Firebase Auth.",
+    "Support at least one OAuth provider (Google and/or Apple).",
+    "Validate inputs client-side and surface clear error messages.",
+    "Create a user profile document on first sign-up.",
+    "Cover the flow with component tests."
+  ],
+  "context": [
+    "frontend/src/app/(auth)/register/page.tsx",
+    "frontend/src/app/(auth)/login/page.tsx",
+    "frontend/src/components/auth/**",
+    "frontend/src/lib/auth.ts"
+  ],
+  "depends_on": [
+    "frontend-bootstrap"
+  ],
+  "notes": ""
+}

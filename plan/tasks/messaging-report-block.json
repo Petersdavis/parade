@@ -1,0 +1,21 @@
+{
+  "id": "messaging-report-block",
+  "title": "Message reporting and blocking in conversations",
+  "phase": "step-4-messaging",
+  "status": "pending",
+  "requirements": [
+    "Allow reporting messages and blocking users from within a conversation.",
+    "Route reports to the moderation queue.",
+    "Immediately hide blocked users' messages.",
+    "Confirm actions to the user."
+  ],
+  "context": [
+    "frontend/src/components/messaging/**",
+    "functions/src/moderation/**"
+  ],
+  "depends_on": [
+    "messaging-realtime-chat",
+    "matching-block-report"
+  ],
+  "notes": ""
+}

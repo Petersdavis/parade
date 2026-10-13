@@ -1,0 +1,20 @@
+{
+  "id": "auth-geofencing",
+  "title": "IP geofencing for non-local flagging",
+  "phase": "step-1-auth",
+  "status": "pending",
+  "requirements": [
+    "Resolve client IP to a coarse geographic region on sign-in.",
+    "Flag users connecting from outside the community region as non-local.",
+    "Store the flag on the user document without storing precise location.",
+    "Document privacy implications and allow user appeal."
+  ],
+  "context": [
+    "functions/src/geofence/**",
+    "frontend/src/lib/geo.ts"
+  ],
+  "depends_on": [
+    "auth-registration"
+  ],
+  "notes": ""
+}

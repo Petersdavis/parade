@@ -1,0 +1,20 @@
+{
+  "id": "messaging-media-sharing",
+  "title": "Media sharing with safety scanning",
+  "phase": "step-4-messaging",
+  "status": "pending",
+  "requirements": [
+    "Allow sharing images and documents via Firebase Storage.",
+    "Scan uploads for unsafe content before delivery.",
+    "Generate signed URLs and enforce access control.",
+    "Show upload progress and handle failures."
+  ],
+  "context": [
+    "frontend/src/components/messaging/Attachment.tsx",
+    "functions/src/storage/**"
+  ],
+  "depends_on": [
+    "messaging-realtime-chat"
+  ],
+  "notes": ""
+}

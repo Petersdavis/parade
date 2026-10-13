@@ -7,7 +7,7 @@
       "id": "infra-firebase-project",
       "title": "Provision Firebase project and environments",
       "phase": "infra",
-      "status": "pending",
+      "status": "done",
       "requirements": [
         "Create Firebase project on the Blaze plan with dev and prod environments.",
         "Enable Firebase Auth, Cloud Firestore, Cloud Functions, Cloud Storage, and Cloud Messaging.",

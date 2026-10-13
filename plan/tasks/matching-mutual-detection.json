@@ -1,0 +1,20 @@
+{
+  "id": "matching-mutual-detection",
+  "title": "Mutual match detection and notification",
+  "phase": "step-3-matching",
+  "status": "pending",
+  "requirements": [
+    "Detect mutual likes via a Firestore trigger.",
+    "Create a match record and notify both users.",
+    "Send push notifications via Firebase Cloud Messaging.",
+    "Surface matches in a dedicated view."
+  ],
+  "context": [
+    "functions/src/matching/**",
+    "frontend/src/app/(app)/matches/page.tsx"
+  ],
+  "depends_on": [
+    "matching-like-pass"
+  ],
+  "notes": ""
+}

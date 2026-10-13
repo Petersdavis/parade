@@ -1,0 +1,21 @@
+{
+  "id": "profile-personal-details",
+  "title": "Personal details capture (name, age, location, photo)",
+  "phase": "step-2-profile",
+  "status": "pending",
+  "requirements": [
+    "Capture name, age, and location with validation.",
+    "Support photo upload to Firebase Storage with client-side resizing.",
+    "Enforce content moderation/safety scanning on uploads.",
+    "Display a profile preview."
+  ],
+  "context": [
+    "frontend/src/components/profile/PersonalDetails.tsx",
+    "frontend/src/components/profile/PhotoUpload.tsx",
+    "functions/src/storage/**"
+  ],
+  "depends_on": [
+    "profile-wizard"
+  ],
+  "notes": ""
+}

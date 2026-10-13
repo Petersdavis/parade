@@ -1,0 +1,20 @@
+{
+  "id": "infra-elasticsearch-vps",
+  "title": "Stand up Elasticsearch on a low-cost VPS",
+  "phase": "infra",
+  "status": "pending",
+  "requirements": [
+    "Provision a Hetzner CX22 (or equivalent ~2GB RAM) VPS.",
+    "Run Elasticsearch via Docker Compose with persistent volume.",
+    "Secure with TLS, authentication, and firewall rules restricting access to Firebase Functions egress.",
+    "Expose a health endpoint and document connection details.",
+    "Provide a docker-compose.yml and setup script in the repo."
+  ],
+  "context": [
+    "infra/elasticsearch/**",
+    "infra/elasticsearch/docker-compose.yml",
+    "infra/elasticsearch/setup.sh"
+  ],
+  "depends_on": [],
+  "notes": ""
+}

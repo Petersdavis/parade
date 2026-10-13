@@ -1,0 +1,20 @@
+{
+  "id": "messaging-push-notifications",
+  "title": "Push notifications via Firebase Cloud Messaging",
+  "phase": "step-4-messaging",
+  "status": "pending",
+  "requirements": [
+    "Register device tokens and store them per user.",
+    "Send push notifications for new messages and matches.",
+    "Respect user notification preferences.",
+    "Handle token refresh and cleanup."
+  ],
+  "context": [
+    "functions/src/notifications/**",
+    "frontend/src/lib/notifications.ts"
+  ],
+  "depends_on": [
+    "messaging-realtime-chat"
+  ],
+  "notes": ""
+}

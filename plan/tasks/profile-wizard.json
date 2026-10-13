@@ -1,0 +1,20 @@
+{
+  "id": "profile-wizard",
+  "title": "Multi-step profile creation wizard",
+  "phase": "step-2-profile",
+  "status": "pending",
+  "requirements": [
+    "Build a quick, painless multi-step wizard with progress indication.",
+    "Persist partial progress so users can resume.",
+    "Validate each step before allowing progression.",
+    "Submit the completed profile to Firestore."
+  ],
+  "context": [
+    "frontend/src/app/(app)/profile/create/page.tsx",
+    "frontend/src/components/profile/**"
+  ],
+  "depends_on": [
+    "auth-session-management"
+  ],
+  "notes": ""
+}

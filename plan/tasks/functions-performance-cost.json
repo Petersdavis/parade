@@ -1,0 +1,21 @@
+{
+  "id": "functions-performance-cost",
+  "title": "Functions performance and cost guardrails",
+  "phase": "infra",
+  "status": "pending",
+  "requirements": [
+    "Keep functions small, event-driven, and single-purpose.",
+    "Use 2nd gen functions and pin regions consistently.",
+    "Minimize cold starts via small bundles and lazy initialization.",
+    "Monitor invocation counts and Firestore read/write volume.",
+    "Document cost guardrails and alert thresholds."
+  ],
+  "context": [
+    "functions/**",
+    "docs/functions-cost.md"
+  ],
+  "depends_on": [
+    "functions-es-sync"
+  ],
+  "notes": ""
+}

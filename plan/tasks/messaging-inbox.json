@@ -1,0 +1,20 @@
+{
+  "id": "messaging-inbox",
+  "title": "Message inbox with previews and unread counts",
+  "phase": "step-4-messaging",
+  "status": "pending",
+  "requirements": [
+    "Query conversations where participants contains the current uid.",
+    "Order by last message timestamp descending.",
+    "Show last-message preview and per-participant unread counts.",
+    "Update in real time."
+  ],
+  "context": [
+    "frontend/src/app/(app)/messages/page.tsx",
+    "frontend/src/components/messaging/**"
+  ],
+  "depends_on": [
+    "messaging-realtime-chat"
+  ],
+  "notes": ""
+}

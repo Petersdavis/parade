@@ -1,0 +1,21 @@
+{
+  "id": "infra-firebase-project",
+  "title": "Provision Firebase project and environments",
+  "phase": "infra",
+  "status": "pending",
+  "requirements": [
+    "Create Firebase project on the Blaze plan with dev and prod environments.",
+    "Enable Firebase Auth, Cloud Firestore, Cloud Functions, Cloud Storage, and Cloud Messaging.",
+    "Pin all services to a single region to minimize latency and cold-start cost.",
+    "Store project config in environment variables; never commit secrets.",
+    "Document project ids and regions in the repo."
+  ],
+  "context": [
+    "infra/**",
+    "firebase.json",
+    ".firebaserc",
+    ".env.example"
+  ],
+  "depends_on": [],
+  "notes": ""
+}

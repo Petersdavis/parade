@@ -1,0 +1,21 @@
+{
+  "id": "matching-search-ui",
+  "title": "Search and filter interface",
+  "phase": "step-3-matching",
+  "status": "pending",
+  "requirements": [
+    "Build a search/filter UI for location, age range, children ages, and lifestyle preferences.",
+    "Debounce queries and show loading states.",
+    "Support pagination or infinite scroll.",
+    "Persist filter state in the URL."
+  ],
+  "context": [
+    "frontend/src/app/(app)/discover/page.tsx",
+    "frontend/src/components/search/**"
+  ],
+  "depends_on": [
+    "profile-wizard",
+    "profile-schema"
+  ],
+  "notes": ""
+}

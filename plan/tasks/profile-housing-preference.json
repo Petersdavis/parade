@@ -1,0 +1,20 @@
+{
+  "id": "profile-housing-preference",
+  "title": "Housing preference and target rent",
+  "phase": "step-2-profile",
+  "status": "pending",
+  "requirements": [
+    "Capture whether the user is seeking shared accommodation or offering accommodation.",
+    "Capture target rent amount and currency.",
+    "Validate ranges and store on the profile document.",
+    "Reflect these fields in the Elasticsearch mapping."
+  ],
+  "context": [
+    "frontend/src/components/profile/HousingPreference.tsx",
+    "shared/types/profile.ts"
+  ],
+  "depends_on": [
+    "profile-schema"
+  ],
+  "notes": ""
+}

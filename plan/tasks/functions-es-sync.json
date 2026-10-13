@@ -1,0 +1,23 @@
+{
+  "id": "functions-es-sync",
+  "title": "Firestore to Elasticsearch sync functions",
+  "phase": "infra",
+  "status": "pending",
+  "requirements": [
+    "Implement onCreate/onUpdate Firestore triggers that sync profiles to Elasticsearch.",
+    "Make handlers idempotent and retry-safe.",
+    "Batch external calls and use 2nd gen functions with region pinning.",
+    "Keep bundles small to reduce cold starts.",
+    "Add structured logging and error alerting."
+  ],
+  "context": [
+    "functions/src/search/sync.ts",
+    "functions/src/index.ts"
+  ],
+  "depends_on": [
+    "profile-schema",
+    "infra-elasticsearch-vps",
+    "infra-firebase-project"
+  ],
+  "notes": ""
+}

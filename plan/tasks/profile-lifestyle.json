@@ -1,0 +1,19 @@
+{
+  "id": "profile-lifestyle",
+  "title": "Lifestyle preferences capture",
+  "phase": "step-2-profile",
+  "status": "pending",
+  "requirements": [
+    "Capture comfort with male visitors, smoking, and drinking.",
+    "Use consistent enumerated values shared with the matching schema.",
+    "Store on the profile document and index in Elasticsearch."
+  ],
+  "context": [
+    "frontend/src/components/profile/Lifestyle.tsx",
+    "shared/types/profile.ts"
+  ],
+  "depends_on": [
+    "profile-schema"
+  ],
+  "notes": ""
+}

@@ -1,0 +1,20 @@
+{
+  "id": "messaging-threading",
+  "title": "Conversation threading and read receipts",
+  "phase": "step-4-messaging",
+  "status": "pending",
+  "requirements": [
+    "Group messages into threaded conversations.",
+    "Implement read receipts and typing indicators.",
+    "Mark messages read on view and update unread counts.",
+    "Keep the UI responsive under rapid updates."
+  ],
+  "context": [
+    "frontend/src/components/messaging/**",
+    "frontend/src/lib/chat.ts"
+  ],
+  "depends_on": [
+    "messaging-inbox"
+  ],
+  "notes": ""
+}

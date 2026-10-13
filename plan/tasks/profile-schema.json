@@ -1,0 +1,21 @@
+{
+  "id": "profile-schema",
+  "title": "Design profile schema for fuzzy matching",
+  "phase": "step-2-profile",
+  "status": "pending",
+  "requirements": [
+    "Define the Firestore profile document schema as the source of truth.",
+    "Define the corresponding Elasticsearch index mapping optimized for fuzzy matching.",
+    "Specify analyzers and fields for location, rent range, lifestyle, children, and pets.",
+    "Version the schema and document migration strategy."
+  ],
+  "context": [
+    "docs/profile-schema.md",
+    "functions/src/search/mapping.json",
+    "shared/types/profile.ts"
+  ],
+  "depends_on": [
+    "infra-elasticsearch-vps"
+  ],
+  "notes": ""
+}

@@ -1,0 +1,23 @@
+{
+  "id": "frontend-bootstrap",
+  "title": "Bootstrap Next.js frontend",
+  "phase": "infra",
+  "status": "pending",
+  "requirements": [
+    "Scaffold a Next.js (App Router) + TypeScript project.",
+    "Configure linting, formatting, and strict TypeScript.",
+    "Add Firebase client SDK and initialize the app from environment config.",
+    "Set up base layout, routing, and a shared UI component library.",
+    "Add a CI check that builds the app."
+  ],
+  "context": [
+    "frontend/**",
+    "frontend/package.json",
+    "frontend/src/app/layout.tsx",
+    "frontend/src/lib/firebase.ts"
+  ],
+  "depends_on": [
+    "infra-firebase-project"
+  ],
+  "notes": ""
+}

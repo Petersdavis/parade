@@ -1,0 +1,20 @@
+{
+  "id": "matching-saved-searches",
+  "title": "Saved searches and new-match notifications",
+  "phase": "step-3-matching",
+  "status": "pending",
+  "requirements": [
+    "Allow users to save search criteria.",
+    "Notify users when new profiles match a saved search.",
+    "Use Firebase Cloud Messaging for push and email fallback.",
+    "Allow managing and deleting saved searches."
+  ],
+  "context": [
+    "frontend/src/components/search/SavedSearches.tsx",
+    "functions/src/notifications/**"
+  ],
+  "depends_on": [
+    "matching-search-ui"
+  ],
+  "notes": ""
+}

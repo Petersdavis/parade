@@ -1,0 +1,20 @@
+{
+  "id": "matching-like-pass",
+  "title": "Like / Pass interaction tracking",
+  "phase": "step-3-matching",
+  "status": "pending",
+  "requirements": [
+    "Record like and pass interactions in Firestore.",
+    "Prevent duplicate interactions and support undo where appropriate.",
+    "Feed interactions into the matching algorithm.",
+    "Persist across sessions."
+  ],
+  "context": [
+    "frontend/src/components/discovery/**",
+    "functions/src/matching/**"
+  ],
+  "depends_on": [
+    "matching-discovery"
+  ],
+  "notes": ""
+}

@@ -1,0 +1,21 @@
+{
+  "id": "auth-account-deletion",
+  "title": "Account deletion and data privacy controls",
+  "phase": "step-1-auth",
+  "status": "pending",
+  "requirements": [
+    "Allow users to request account deletion from settings.",
+    "Delete or anonymize all personal data across Firestore, Storage, and Elasticsearch.",
+    "Provide a data export (GDPR-style) endpoint.",
+    "Confirm deletion via email and log the action for audit."
+  ],
+  "context": [
+    "frontend/src/app/(app)/settings/privacy/page.tsx",
+    "functions/src/privacy/**"
+  ],
+  "depends_on": [
+    "auth-session-management",
+    "infra-elasticsearch-vps"
+  ],
+  "notes": ""
+}

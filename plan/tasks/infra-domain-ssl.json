@@ -1,0 +1,21 @@
+{
+  "id": "infra-domain-ssl",
+  "title": "Configure domain and SSL",
+  "phase": "infra",
+  "status": "pending",
+  "requirements": [
+    "Register or delegate the production domain.",
+    "Point DNS to the Next.js hosting target (e.g. Firebase Hosting or Vercel).",
+    "Provision and auto-renew TLS certificates.",
+    "Force HTTPS and configure HSTS.",
+    "Document DNS records in the repo."
+  ],
+  "context": [
+    "infra/**",
+    "infra/dns.md"
+  ],
+  "depends_on": [
+    "infra-firebase-project"
+  ],
+  "notes": ""
+}

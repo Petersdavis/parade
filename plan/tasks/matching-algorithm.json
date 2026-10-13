@@ -1,0 +1,22 @@
+{
+  "id": "matching-algorithm",
+  "title": "Compatibility scoring algorithm",
+  "phase": "step-3-matching",
+  "status": "pending",
+  "requirements": [
+    "Implement a compatibility score based on preferences and values.",
+    "Use Elasticsearch fuzzy matching for candidate retrieval.",
+    "Weight location, rent range, lifestyle, children, and pets.",
+    "Expose the score and contributing factors for transparency."
+  ],
+  "context": [
+    "functions/src/search/**",
+    "functions/src/matching/**",
+    "shared/types/matching.ts"
+  ],
+  "depends_on": [
+    "profile-schema",
+    "infra-elasticsearch-vps"
+  ],
+  "notes": ""
+}
