@@ -1,0 +1,623 @@
+{
+  "project": "parade",
+  "description": "Co-parenting and co-habitation matchmaking platform for single mothers. Stack: Next.js frontend, Firebase (Auth, Firestore, Functions, Storage, FCM) backend, Elasticsearch on a low-cost VPS for matching.",
+  "status_values": ["pending", "in_progress", "blocked", "review", "done"],
+  "tasks": [
+    {
+      "id": "infra-firebase-project",
+      "title": "Provision Firebase project and environments",
+      "phase": "infra",
+      "status": "pending",
+      "requirements": [
+        "Create Firebase project on the Blaze plan with dev and prod environments.",
+        "Enable Firebase Auth, Cloud Firestore, Cloud Functions, Cloud Storage, and Cloud Messaging.",
+        "Pin all services to a single region to minimize latency and cold-start cost.",
+        "Store project config in environment variables; never commit secrets.",
+        "Document project ids and regions in the repo."
+      ],
+      "context": [
+        "infra/**",
+        "firebase.json",
+        ".firebaserc",
+        ".env.example"
+      ],
+      "depends_on": [],
+      "notes": ""
+    },
+    {
+      "id": "infra-elasticsearch-vps",
+      "title": "Stand up Elasticsearch on a low-cost VPS",
+      "phase": "infra",
+      "status": "pending",
+      "requirements": [
+        "Provision a Hetzner CX22 (or equivalent ~2GB RAM) VPS.",
+        "Run Elasticsearch via Docker Compose with persistent volume.",
+        "Secure with TLS, authentication, and firewall rules restricting access to Firebase Functions egress.",
+        "Expose a health endpoint and document connection details.",
+        "Provide a docker-compose.yml and setup script in the repo."
+      ],
+      "context": [
+        "infra/elasticsearch/**",
+        "infra/elasticsearch/docker-compose.yml",
+        "infra/elasticsearch/setup.sh"
+      ],
+      "depends_on": [],
+      "notes": ""
+    },
+    {
+      "id": "infra-domain-ssl",
+      "title": "Configure domain and SSL",
+      "phase": "infra",
+      "status": "pending",
+      "requirements": [
+        "Register or delegate the production domain.",
+        "Point DNS to the Next.js hosting target (e.g. Firebase Hosting or Vercel).",
+        "Provision and auto-renew TLS certificates.",
+        "Force HTTPS and configure HSTS.",
+        "Document DNS records in the repo."
+      ],
+      "context": [
+        "infra/**",
+        "infra/dns.md"
+      ],
+      "depends_on": ["infra-firebase-project"],
+      "notes": ""
+    },
+    {
+      "id": "frontend-bootstrap",
+      "title": "Bootstrap Next.js frontend",
+      "phase": "infra",
+      "status": "pending",
+      "requirements": [
+        "Scaffold a Next.js (App Router) + TypeScript project.",
+        "Configure linting, formatting, and strict TypeScript.",
+        "Add Firebase client SDK and initialize the app from environment config.",
+        "Set up base layout, routing, and a shared UI component library.",
+        "Add a CI check that builds the app."
+      ],
+      "context": [
+        "frontend/**",
+        "frontend/package.json",
+        "frontend/src/app/layout.tsx",
+        "frontend/src/lib/firebase.ts"
+      ],
+      "depends_on": ["infra-firebase-project"],
+      "notes": ""
+    },
+    {
+      "id": "auth-registration",
+      "title": "User registration (email/password + OAuth)",
+      "phase": "step-1-auth",
+      "status": "pending",
+      "requirements": [
+        "Implement email/password sign-up and sign-in using Firebase Auth.",
+        "Support at least one OAuth provider (Google and/or Apple).",
+        "Validate inputs client-side and surface clear error messages.",
+        "Create a user profile document on first sign-up.",
+        "Cover the flow with component tests."
+      ],
+      "context": [
+        "frontend/src/app/(auth)/register/page.tsx",
+        "frontend/src/app/(auth)/login/page.tsx",
+        "frontend/src/components/auth/**",
+        "frontend/src/lib/auth.ts"
+      ],
+      "depends_on": ["frontend-bootstrap"],
+      "notes": ""
+    },
+    {
+      "id": "auth-email-verification",
+      "title": "Email verification flow",
+      "phase": "step-1-auth",
+      "status": "pending",
+      "requirements": [
+        "Send a verification email on registration via Firebase Auth.",
+        "Gate protected routes until the email is verified.",
+        "Provide a resend-verification action with rate limiting.",
+        "Show clear status messaging to the user."
+      ],
+      "context": [
+        "frontend/src/app/(auth)/verify-email/page.tsx",
+        "frontend/src/components/auth/**",
+        "frontend/src/lib/auth.ts"
+      ],
+      "depends_on": ["auth-registration"],
+      "notes": ""
+    },
+    {
+      "id": "auth-identity-verification",
+      "title": "Identity verification (ID upload + background check)",
+      "phase": "step-1-auth",
+      "status": "pending",
+      "requirements": [
+        "Allow users to upload government ID to Firebase Storage with signed URLs.",
+        "Integrate a background-check provider (e.g. Checkr/Persona) via a Firebase Function.",
+        "Store verification status on the user document; never store raw ID data in Firestore.",
+        "Enforce retention and deletion policy for uploaded documents.",
+        "Expose verification status in the UI."
+      ],
+      "context": [
+        "frontend/src/app/(auth)/verify-identity/page.tsx",
+        "functions/src/identity/**",
+        "frontend/src/components/auth/**"
+      ],
+      "depends_on": ["auth-email-verification", "infra-firebase-project"],
+      "notes": ""
+    },
+    {
+      "id": "auth-geofencing",
+      "title": "IP geofencing for non-local flagging",
+      "phase": "step-1-auth",
+      "status": "pending",
+      "requirements": [
+        "Resolve client IP to a coarse geographic region on sign-in.",
+        "Flag users connecting from outside the community region as non-local.",
+        "Store the flag on the user document without storing precise location.",
+        "Document privacy implications and allow user appeal."
+      ],
+      "context": [
+        "functions/src/geofence/**",
+        "frontend/src/lib/geo.ts"
+      ],
+      "depends_on": ["auth-registration"],
+      "notes": ""
+    },
+    {
+      "id": "auth-session-management",
+      "title": "Session management (JWT / cookie-based)",
+      "phase": "step-1-auth",
+      "status": "pending",
+      "requirements": [
+        "Use Firebase ID tokens with secure, httpOnly session cookies for SSR.",
+        "Implement token refresh and silent re-auth.",
+        "Handle sign-out across tabs and devices.",
+        "Protect server routes and API handlers with verified tokens."
+      ],
+      "context": [
+        "frontend/src/lib/session.ts",
+        "frontend/src/middleware.ts",
+        "functions/src/auth/**"
+      ],
+      "depends_on": ["auth-registration"],
+      "notes": ""
+    },
+    {
+      "id": "auth-password-reset",
+      "title": "Password reset flow",
+      "phase": "step-1-auth",
+      "status": "pending",
+      "requirements": [
+        "Implement forgot-password request using Firebase Auth.",
+        "Send a reset email with a secure, expiring link.",
+        "Provide a reset-password page that validates the code and updates the password.",
+        "Rate-limit reset requests to prevent abuse."
+      ],
+      "context": [
+        "frontend/src/app/(auth)/forgot-password/page.tsx",
+        "frontend/src/app/(auth)/reset-password/page.tsx",
+        "frontend/src/lib/auth.ts"
+      ],
+      "depends_on": ["auth-registration"],
+      "notes": ""
+    },
+    {
+      "id": "auth-account-deletion",
+      "title": "Account deletion and data privacy controls",
+      "phase": "step-1-auth",
+      "status": "pending",
+      "requirements": [
+        "Allow users to request account deletion from settings.",
+        "Delete or anonymize all personal data across Firestore, Storage, and Elasticsearch.",
+        "Provide a data export (GDPR-style) endpoint.",
+        "Confirm deletion via email and log the action for audit."
+      ],
+      "context": [
+        "frontend/src/app/(app)/settings/privacy/page.tsx",
+        "functions/src/privacy/**"
+      ],
+      "depends_on": ["auth-session-management", "infra-elasticsearch-vps"],
+      "notes": ""
+    },
+    {
+      "id": "profile-wizard",
+      "title": "Multi-step profile creation wizard",
+      "phase": "step-2-profile",
+      "status": "pending",
+      "requirements": [
+        "Build a quick, painless multi-step wizard with progress indication.",
+        "Persist partial progress so users can resume.",
+        "Validate each step before allowing progression.",
+        "Submit the completed profile to Firestore."
+      ],
+      "context": [
+        "frontend/src/app/(app)/profile/create/page.tsx",
+        "frontend/src/components/profile/**"
+      ],
+      "depends_on": ["auth-session-management"],
+      "notes": ""
+    },
+    {
+      "id": "profile-schema",
+      "title": "Design profile schema for fuzzy matching",
+      "phase": "step-2-profile",
+      "status": "pending",
+      "requirements": [
+        "Define the Firestore profile document schema as the source of truth.",
+        "Define the corresponding Elasticsearch index mapping optimized for fuzzy matching.",
+        "Specify analyzers and fields for location, rent range, lifestyle, children, and pets.",
+        "Version the schema and document migration strategy."
+      ],
+      "context": [
+        "docs/profile-schema.md",
+        "functions/src/search/mapping.json",
+        "shared/types/profile.ts"
+      ],
+      "depends_on": ["infra-elasticsearch-vps"],
+      "notes": ""
+    },
+    {
+      "id": "profile-personal-details",
+      "title": "Personal details capture (name, age, location, photo)",
+      "phase": "step-2-profile",
+      "status": "pending",
+      "requirements": [
+        "Capture name, age, and location with validation.",
+        "Support photo upload to Firebase Storage with client-side resizing.",
+        "Enforce content moderation/safety scanning on uploads.",
+        "Display a profile preview."
+      ],
+      "context": [
+        "frontend/src/components/profile/PersonalDetails.tsx",
+        "frontend/src/components/profile/PhotoUpload.tsx",
+        "functions/src/storage/**"
+      ],
+      "depends_on": ["profile-wizard"],
+      "notes": ""
+    },
+    {
+      "id": "profile-housing-preference",
+      "title": "Housing preference and target rent",
+      "phase": "step-2-profile",
+      "status": "pending",
+      "requirements": [
+        "Capture whether the user is seeking shared accommodation or offering accommodation.",
+        "Capture target rent amount and currency.",
+        "Validate ranges and store on the profile document.",
+        "Reflect these fields in the Elasticsearch mapping."
+      ],
+      "context": [
+        "frontend/src/components/profile/HousingPreference.tsx",
+        "shared/types/profile.ts"
+      ],
+      "depends_on": ["profile-schema"],
+      "notes": ""
+    },
+    {
+      "id": "profile-lifestyle",
+      "title": "Lifestyle preferences capture",
+      "phase": "step-2-profile",
+      "status": "pending",
+      "requirements": [
+        "Capture comfort with male visitors, smoking, and drinking.",
+        "Use consistent enumerated values shared with the matching schema.",
+        "Store on the profile document and index in Elasticsearch."
+      ],
+      "context": [
+        "frontend/src/components/profile/Lifestyle.tsx",
+        "shared/types/profile.ts"
+      ],
+      "depends_on": ["profile-schema"],
+      "notes": ""
+    },
+    {
+      "id": "profile-children-pets",
+      "title": "Children and pets details",
+      "phase": "step-2-profile",
+      "status": "pending",
+      "requirements": [
+        "Capture number of children and their ages.",
+        "Capture current pets and types.",
+        "Validate inputs and store on the profile document.",
+        "Index these fields for matching."
+      ],
+      "context": [
+        "frontend/src/components/profile/ChildrenPets.tsx",
+        "shared/types/profile.ts"
+      ],
+      "depends_on": ["profile-schema"],
+      "notes": ""
+    },
+    {
+      "id": "matching-search-ui",
+      "title": "Search and filter interface",
+      "phase": "step-3-matching",
+      "status": "pending",
+      "requirements": [
+        "Build a search/filter UI for location, age range, children ages, and lifestyle preferences.",
+        "Debounce queries and show loading states.",
+        "Support pagination or infinite scroll.",
+        "Persist filter state in the URL."
+      ],
+      "context": [
+        "frontend/src/app/(app)/discover/page.tsx",
+        "frontend/src/components/search/**"
+      ],
+      "depends_on": ["profile-wizard", "profile-schema"],
+      "notes": ""
+    },
+    {
+      "id": "matching-discovery",
+      "title": "Swipe or browse-style profile discovery",
+      "phase": "step-3-matching",
+      "status": "pending",
+      "requirements": [
+        "Implement swipe or browse discovery with smooth interactions.",
+        "Preload the next profiles for responsiveness.",
+        "Handle empty and error states gracefully.",
+        "Be responsive on mobile and desktop."
+      ],
+      "context": [
+        "frontend/src/app/(app)/discover/page.tsx",
+        "frontend/src/components/discovery/**"
+      ],
+      "depends_on": ["matching-search-ui"],
+      "notes": ""
+    },
+    {
+      "id": "matching-algorithm",
+      "title": "Compatibility scoring algorithm",
+      "phase": "step-3-matching",
+      "status": "pending",
+      "requirements": [
+        "Implement a compatibility score based on preferences and values.",
+        "Use Elasticsearch fuzzy matching for candidate retrieval.",
+        "Weight location, rent range, lifestyle, children, and pets.",
+        "Expose the score and contributing factors for transparency."
+      ],
+      "context": [
+        "functions/src/search/**",
+        "functions/src/matching/**",
+        "shared/types/matching.ts"
+      ],
+      "depends_on": ["profile-schema", "infra-elasticsearch-vps"],
+      "notes": ""
+    },
+    {
+      "id": "matching-saved-searches",
+      "title": "Saved searches and new-match notifications",
+      "phase": "step-3-matching",
+      "status": "pending",
+      "requirements": [
+        "Allow users to save search criteria.",
+        "Notify users when new profiles match a saved search.",
+        "Use Firebase Cloud Messaging for push and email fallback.",
+        "Allow managing and deleting saved searches."
+      ],
+      "context": [
+        "frontend/src/components/search/SavedSearches.tsx",
+        "functions/src/notifications/**"
+      ],
+      "depends_on": ["matching-search-ui"],
+      "notes": ""
+    },
+    {
+      "id": "matching-like-pass",
+      "title": "Like / Pass interaction tracking",
+      "phase": "step-3-matching",
+      "status": "pending",
+      "requirements": [
+        "Record like and pass interactions in Firestore.",
+        "Prevent duplicate interactions and support undo where appropriate.",
+        "Feed interactions into the matching algorithm.",
+        "Persist across sessions."
+      ],
+      "context": [
+        "frontend/src/components/discovery/**",
+        "functions/src/matching/**"
+      ],
+      "depends_on": ["matching-discovery"],
+      "notes": ""
+    },
+    {
+      "id": "matching-mutual-detection",
+      "title": "Mutual match detection and notification",
+      "phase": "step-3-matching",
+      "status": "pending",
+      "requirements": [
+        "Detect mutual likes via a Firestore trigger.",
+        "Create a match record and notify both users.",
+        "Send push notifications via Firebase Cloud Messaging.",
+        "Surface matches in a dedicated view."
+      ],
+      "context": [
+        "functions/src/matching/**",
+        "frontend/src/app/(app)/matches/page.tsx"
+      ],
+      "depends_on": ["matching-like-pass"],
+      "notes": ""
+    },
+    {
+      "id": "matching-block-report",
+      "title": "Block and report functionality",
+      "phase": "step-3-matching",
+      "status": "pending",
+      "requirements": [
+        "Allow users to block and report other profiles.",
+        "Exclude blocked users from search and discovery.",
+        "Route reports to a moderation queue.",
+        "Confirm actions and allow unblocking."
+      ],
+      "context": [
+        "frontend/src/components/moderation/**",
+        "functions/src/moderation/**"
+      ],
+      "depends_on": ["matching-discovery"],
+      "notes": ""
+    },
+    {
+      "id": "messaging-realtime-chat",
+      "title": "Real-time chat via Firestore listeners",
+      "phase": "step-4-messaging",
+      "status": "pending",
+      "requirements": [
+        "Implement real-time messaging using Firestore onSnapshot listeners.",
+        "Use the conversations/messages data model defined in the README.",
+        "Enforce security rules so only participants can read/write.",
+        "Handle reconnection and offline states."
+      ],
+      "context": [
+        "frontend/src/app/(app)/messages/[conversationId]/page.tsx",
+        "frontend/src/lib/chat.ts",
+        "firestore.rules"
+      ],
+      "depends_on": ["matching-mutual-detection"],
+      "notes": ""
+    },
+    {
+      "id": "messaging-inbox",
+      "title": "Message inbox with previews and unread counts",
+      "phase": "step-4-messaging",
+      "status": "pending",
+      "requirements": [
+        "Query conversations where participants contains the current uid.",
+        "Order by last message timestamp descending.",
+        "Show last-message preview and per-participant unread counts.",
+        "Update in real time."
+      ],
+      "context": [
+        "frontend/src/app/(app)/messages/page.tsx",
+        "frontend/src/components/messaging/**"
+      ],
+      "depends_on": ["messaging-realtime-chat"],
+      "notes": ""
+    },
+    {
+      "id": "messaging-threading",
+      "title": "Conversation threading and read receipts",
+      "phase": "step-4-messaging",
+      "status": "pending",
+      "requirements": [
+        "Group messages into threaded conversations.",
+        "Implement read receipts and typing indicators.",
+        "Mark messages read on view and update unread counts.",
+        "Keep the UI responsive under rapid updates."
+      ],
+      "context": [
+        "frontend/src/components/messaging/**",
+        "frontend/src/lib/chat.ts"
+      ],
+      "depends_on": ["messaging-inbox"],
+      "notes": ""
+    },
+    {
+      "id": "messaging-media-sharing",
+      "title": "Media sharing with safety scanning",
+      "phase": "step-4-messaging",
+      "status": "pending",
+      "requirements": [
+        "Allow sharing images and documents via Firebase Storage.",
+        "Scan uploads for unsafe content before delivery.",
+        "Generate signed URLs and enforce access control.",
+        "Show upload progress and handle failures."
+      ],
+      "context": [
+        "frontend/src/components/messaging/Attachment.tsx",
+        "functions/src/storage/**"
+      ],
+      "depends_on": ["messaging-realtime-chat"],
+      "notes": ""
+    },
+    {
+      "id": "messaging-report-block",
+      "title": "Message reporting and blocking in conversations",
+      "phase": "step-4-messaging",
+      "status": "pending",
+      "requirements": [
+        "Allow reporting messages and blocking users from within a conversation.",
+        "Route reports to the moderation queue.",
+        "Immediately hide blocked users' messages.",
+        "Confirm actions to the user."
+      ],
+      "context": [
+        "frontend/src/components/messaging/**",
+        "functions/src/moderation/**"
+      ],
+      "depends_on": ["messaging-realtime-chat", "matching-block-report"],
+      "notes": ""
+    },
+    {
+      "id": "messaging-push-notifications",
+      "title": "Push notifications via Firebase Cloud Messaging",
+      "phase": "step-4-messaging",
+      "status": "pending",
+      "requirements": [
+        "Register device tokens and store them per user.",
+        "Send push notifications for new messages and matches.",
+        "Respect user notification preferences.",
+        "Handle token refresh and cleanup."
+      ],
+      "context": [
+        "functions/src/notifications/**",
+        "frontend/src/lib/notifications.ts"
+      ],
+      "depends_on": ["messaging-realtime-chat"],
+      "notes": ""
+    },
+    {
+      "id": "messaging-icebreakers",
+      "title": "Optional icebreaker prompts",
+      "phase": "step-4-messaging",
+      "status": "pending",
+      "requirements": [
+        "Offer optional icebreaker prompts to start conversations.",
+        "Allow inserting a prompt as the first message.",
+        "Keep prompts configurable and non-intrusive.",
+        "Track usage for product insight."
+      ],
+      "context": [
+        "frontend/src/components/messaging/Icebreakers.tsx",
+        "shared/data/icebreakers.ts"
+      ],
+      "depends_on": ["messaging-realtime-chat"],
+      "notes": ""
+    },
+    {
+      "id": "functions-es-sync",
+      "title": "Firestore to Elasticsearch sync functions",
+      "phase": "infra",
+      "status": "pending",
+      "requirements": [
+        "Implement onCreate/onUpdate Firestore triggers that sync profiles to Elasticsearch.",
+        "Make handlers idempotent and retry-safe.",
+        "Batch external calls and use 2nd gen functions with region pinning.",
+        "Keep bundles small to reduce cold starts.",
+        "Add structured logging and error alerting."
+      ],
+      "context": [
+        "functions/src/search/sync.ts",
+        "functions/src/index.ts"
+      ],
+      "depends_on": ["profile-schema", "infra-elasticsearch-vps", "infra-firebase-project"],
+      "notes": ""
+    },
+    {
+      "id": "functions-performance-cost",
+      "title": "Functions performance and cost guardrails",
+      "phase": "infra",
+      "status": "pending",
+      "requirements": [
+        "Keep functions small, event-driven, and single-purpose.",
+        "Use 2nd gen functions and pin regions consistently.",
+        "Minimize cold starts via small bundles and lazy initialization.",
+        "Monitor invocation counts and Firestore read/write volume.",
+        "Document cost guardrails and alert thresholds."
+      ],
+      "context": [
+        "functions/**",
+        "docs/functions-cost.md"
+      ],
+      "depends_on": ["functions-es-sync"],
+      "notes": ""
+    }
+  ]
+}
