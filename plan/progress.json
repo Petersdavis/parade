@@ -75,7 +75,7 @@
       "id": "frontend-bootstrap",
       "title": "Bootstrap Next.js frontend",
       "phase": "infra",
-      "status": "pending",
+      "status": "done",
       "requirements": [
         "Scaffold a Next.js (App Router) + TypeScript project.",
         "Configure linting, formatting, and strict TypeScript.",
@@ -182,27 +182,6 @@
       "notes": ""
     },
     {
-      "id": "auth-session-management",
-      "title": "Session management (JWT / cookie-based)",
-      "phase": "step-1-auth",
-      "status": "pending",
-      "requirements": [
-        "Use Firebase ID tokens with secure, httpOnly session cookies for SSR.",
-        "Implement token refresh and silent re-auth.",
-        "Handle sign-out across tabs and devices.",
-        "Protect server routes and API handlers with verified tokens."
-      ],
-      "context": [
-        "frontend/src/lib/session.ts",
-        "frontend/src/middleware.ts",
-        "functions/src/auth/**"
-      ],
-      "depends_on": [
-        "auth-registration"
-      ],
-      "notes": ""
-    },
-    {
       "id": "auth-password-reset",
       "title": "Password reset flow",
       "phase": "step-1-auth",
@@ -239,7 +218,6 @@
         "functions/src/privacy/**"
       ],
       "depends_on": [
-        "auth-session-management",
         "infra-elasticsearch-vps"
       ],
       "notes": ""
@@ -259,9 +237,7 @@
         "frontend/src/app/(app)/profile/create/page.tsx",
         "frontend/src/components/profile/**"
       ],
-      "depends_on": [
-        "auth-session-management"
-      ],
+      "depends_on": [],
       "notes": ""
     },
     {

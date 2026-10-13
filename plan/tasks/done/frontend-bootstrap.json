@@ -1,0 +1,23 @@
+{
+  "id": "frontend-bootstrap",
+  "title": "Bootstrap Next.js frontend",
+  "phase": "infra",
+  "status": "pending",
+  "requirements": [
+    "Scaffold a Next.js (App Router) + TypeScript project.",
+    "Configure linting, formatting, and strict TypeScript.",
+    "Add Firebase client SDK and initialize the app from environment config.",
+    "Set up base layout, routing, and a shared UI component library.",
+    "Add a CI check that builds the app."
+  ],
+  "context": [
+    "frontend/**",
+    "frontend/package.json",
+    "frontend/src/app/layout.tsx",
+    "frontend/src/lib/firebase.ts"
+  ],
+  "depends_on": [
+    "infra-firebase-project"
+  ],
+  "notes": "Done. Scaffolded Next.js 15 (App Router) + TypeScript in frontend/ as a FULLY STATIC site via `output: \"export\"` in frontend/next.config.ts. Every route is prerendered at build time (SSG) into frontend/out/; no Node server runs on requests. Firebase Hosting (root firebase.json) now serves frontend/out with cleanUrls + trailingSlash and a catch-all rewrite to /index.html.\n\nKey files: frontend/package.json, frontend/next.config.ts, frontend/tsconfig.json (strict + noUncheckedIndexedAccess), frontend/eslint.config.mjs (next/core-web-vitals + next/typescript + prettier), frontend/.prettierrc.json, frontend/.env.example, frontend/src/lib/env.ts (typed NEXT_PUBLIC_* config), frontend/src/lib/firebase.ts (lazy idempotent Firebase app/auth/firestore/storage singletons with emulator support), frontend/src/app/layout.tsx, frontend/src/components/layout/AppShell.tsx + NavBar.tsx, frontend/src/components/ui/Button.tsx + Card.tsx.\n\nCI: added .github/workflows/frontend-ci.yml (npm ci -> lint -> format:check -> typecheck -> build). Updated the two Firebase Hosting deploy workflows to build frontend/ before deploying and to inject NEXT_PUBLIC_FIREBASE_* from repo secrets.\n\nDESIGN DECISION / CAVEAT: static export is incompatible with request-time SSR features (middleware, server actions, route handlers, ISR, per-request cookies). The auth-session-management task mentions httpOnly session cookies for SSR — that approach will NOT work here. Session handling must be client-side Firebase ID tokens (the SDK handles refresh). Flagged for the auth-session-management task.\n\nVerified locally: `npm run typecheck`, `npm run lint`, `npm run format:check`, and `npm run build` all pass; build emits static HTML for /, /about, and /_not-found into out/.\n\nFollow-ups: (1) add real NEXT_PUBLIC_FIREBASE_* values to .env.local and repo secrets; (2) consider migrating off deprecated `next lint` to the ESLint CLI before Next.js 16; (3) npm audit reports 11 advisories (1 moderate, 10 high) in the dependency tree — review separately."
+}
