@@ -7,6 +7,7 @@ import RegisterPage from "./page";
 const replace = vi.fn();
 const signUpWithEmail = vi.fn();
 const signInWithGoogle = vi.fn();
+const sendVerificationEmail = vi.fn();
 const useAuth = vi.fn();
 
 vi.mock("next/navigation", () => ({
@@ -23,6 +24,7 @@ vi.mock("@/lib/auth", async () => {
     ...actual,
     signUpWithEmail: (...args: unknown[]) => signUpWithEmail(...args),
     signInWithGoogle: (...args: unknown[]) => signInWithGoogle(...args),
+    sendVerificationEmail: (...args: unknown[]) => sendVerificationEmail(...args),
   };
 });
 
@@ -31,9 +33,11 @@ describe("RegisterPage", () => {
     replace.mockReset();
     signUpWithEmail.mockReset();
     signInWithGoogle.mockReset();
+    sendVerificationEmail.mockReset();
+    sendVerificationEmail.mockResolvedValue(undefined);
     useAuth.mockReset();
     // Default: signed out, auth state resolved.
-    useAuth.mockReturnValue({ user: null, loading: false });
+    useAuth.mockReturnValue({ user: null, loading: false, emailVerified: false });
   });
 
   it("renders the registration form", () => {
@@ -71,9 +75,10 @@ describe("RegisterPage", () => {
     expect(signUpWithEmail).not.toHaveBeenCalled();
   });
 
-  it("submits a valid form and lets the auth listener redirect", async () => {
+  it("submits a valid form, sends a verification email, and lets the auth listener redirect", async () => {
     const user = userEvent.setup();
-    signUpWithEmail.mockResolvedValue({ user: { uid: "abc" } });
+    const createdUser = { uid: "abc" };
+    signUpWithEmail.mockResolvedValue({ user: createdUser });
     render(<RegisterPage />);
 
     await user.type(screen.getByLabelText(/^name$/i), "Jane");
@@ -85,19 +90,29 @@ describe("RegisterPage", () => {
     await waitFor(() => {
       expect(signUpWithEmail).toHaveBeenCalledWith("jane@example.com", "longenough", "Jane");
     });
+    await waitFor(() => {
+      expect(sendVerificationEmail).toHaveBeenCalledWith(createdUser);
+    });
     // The redirect is driven by auth state, not an imperative push.
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it("redirects home once the auth state reports a signed-in user", () => {
-    useAuth.mockReturnValue({ user: { uid: "abc" }, loading: false });
+  it("redirects unverified users to the verification gate", () => {
+    useAuth.mockReturnValue({ user: { uid: "abc" }, loading: false, emailVerified: false });
+    render(<RegisterPage />);
+
+    expect(replace).toHaveBeenCalledWith("/verify-email");
+  });
+
+  it("redirects verified users home", () => {
+    useAuth.mockReturnValue({ user: { uid: "abc" }, loading: false, emailVerified: true });
     render(<RegisterPage />);
 
     expect(replace).toHaveBeenCalledWith("/");
   });
 
   it("does not redirect while auth state is still loading", () => {
-    useAuth.mockReturnValue({ user: null, loading: true });
+    useAuth.mockReturnValue({ user: null, loading: true, emailVerified: false });
     render(<RegisterPage />);
 
     expect(replace).not.toHaveBeenCalled();

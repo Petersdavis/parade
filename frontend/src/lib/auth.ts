@@ -13,6 +13,8 @@ import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  onIdTokenChanged,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -139,9 +141,90 @@ export async function signOutUser(): Promise<void> {
   await signOut(auth());
 }
 
+/**
+ * Send (or resend) the Firebase email-verification message to the given user.
+ *
+ * Firebase itself throttles verification emails, but we also enforce a
+ * client-side cooldown so the UI can disable the resend action and give the
+ * user an accurate countdown instead of surfacing a raw `auth/too-many-requests`
+ * error. The cooldown is tracked per user id in memory.
+ */
+export const VERIFICATION_RESEND_COOLDOWN_MS = 60_000;
+
+const lastVerificationSentAt = new Map<string, number>();
+
+/**
+ * Milliseconds remaining before another verification email may be sent for the
+ * user, or 0 when the user may send one immediately.
+ */
+export function getVerificationResendCooldown(user: User, now: number = Date.now()): number {
+  const last = lastVerificationSentAt.get(user.uid);
+  if (last === undefined) {
+    return 0;
+  }
+  const remaining = VERIFICATION_RESEND_COOLDOWN_MS - (now - last);
+  return remaining > 0 ? remaining : 0;
+}
+
+/** Thrown when a resend is attempted before the cooldown has elapsed. */
+export class VerificationRateLimitError extends Error {
+  /** Milliseconds the caller must wait before retrying. */
+  readonly retryAfterMs: number;
+
+  constructor(retryAfterMs: number) {
+    super("Please wait before requesting another verification email.");
+    this.name = "VerificationRateLimitError";
+    this.retryAfterMs = retryAfterMs;
+  }
+}
+
+/**
+ * Send the verification email to the current user, enforcing the client-side
+ * cooldown. Throws {@link VerificationRateLimitError} when called too soon.
+ *
+ * `now` is injectable for deterministic tests; production callers omit it.
+ */
+export async function sendVerificationEmail(user: User, now: number = Date.now()): Promise<void> {
+  const remaining = getVerificationResendCooldown(user, now);
+  if (remaining > 0) {
+    throw new VerificationRateLimitError(remaining);
+  }
+
+  await sendEmailVerification(user);
+  lastVerificationSentAt.set(user.uid, now);
+}
+
+/**
+ * Reload the user from Firebase and return the fresh instance.
+ *
+ * `emailVerified` is only updated on the local `User` after a reload, so the
+ * verify-email page calls this when the user says they have clicked the link.
+ */
+export async function reloadUser(user: User): Promise<User> {
+  await user.reload();
+  return auth().currentUser ?? user;
+}
+
+/** Reset the in-memory resend cooldown. Intended for tests. */
+export function resetVerificationCooldown(): void {
+  lastVerificationSentAt.clear();
+}
+
 /** Subscribe to auth state changes. Returns the unsubscribe function. */
 export function subscribeToAuthState(callback: (user: User | null) => void): () => void {
   return onAuthStateChanged(auth(), callback);
+}
+
+/**
+ * Subscribe to ID-token changes. Returns the unsubscribe function.
+ *
+ * Unlike `onAuthStateChanged`, this fires whenever the ID token is refreshed —
+ * including right after the user verifies their email, at which point the
+ * refreshed `User` reports `emailVerified: true`. This is the primary signal
+ * the app uses to react to verification automatically.
+ */
+export function subscribeToIdTokenChanges(callback: (user: User | null) => void): () => void {
+  return onIdTokenChanged(auth(), callback);
 }
 
 /**
@@ -171,6 +254,14 @@ export function getAuthErrorMessage(error: unknown): string {
       return "Incorrect email or password.";
     case "auth/too-many-requests":
       return "Too many attempts. Please wait a moment and try again.";
+    case "auth/expired-action-code":
+      return "That verification link has expired. Request a new one.";
+    case "auth/invalid-action-code":
+      return "That verification link is no longer valid. Request a new one.";
+    case "auth/user-disabled":
+      return "This account has been disabled. Please contact support.";
+    case "auth/requires-recent-login":
+      return "Please sign in again to continue.";
     case "auth/popup-closed-by-user":
     case "auth/cancelled-popup-request":
       return "Sign-in was cancelled.";

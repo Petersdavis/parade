@@ -15,7 +15,7 @@ const links = [
 ];
 
 export function NavBar() {
-  const { user, loading } = useAuth();
+  const { user, loading, emailVerified } = useAuth();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
 
@@ -41,6 +41,11 @@ export function NavBar() {
               <Link href={link.href}>{link.label}</Link>
             </li>
           ))}
+          {!loading && user && !emailVerified ? (
+            <li>
+              <Link href="/verify-email">Verify email</Link>
+            </li>
+          ) : null}
           {!loading && user ? (
             <li>
               <button

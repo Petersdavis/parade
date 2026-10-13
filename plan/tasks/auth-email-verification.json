@@ -2,7 +2,7 @@
   "id": "auth-email-verification",
   "title": "Email verification flow",
   "phase": "step-1-auth",
-  "status": "pending",
+  "status": "done",
   "requirements": [
     "Send a verification email on registration via Firebase Auth.",
     "Gate protected routes until the email is verified.",
@@ -17,5 +17,5 @@
   "depends_on": [
     "auth-registration"
   ],
-  "notes": ""
+  "notes": "Implemented on top of the existing Firebase Auth workflow. lib/auth.ts gained sendVerificationEmail (with a 60s per-user client-side cooldown and VerificationRateLimitError), getVerificationResendCooldown, reloadUser, subscribeToIdTokenChanges, and verification-specific error mappings. AuthProvider now exposes emailVerified + reloadUser and auto-detects verification via onIdTokenChanged plus a 5s poll and focus/visibility reload while unverified. Registration sends the verification email and redirects unverified users to /verify-email. New /verify-email page shows status messaging, a resend action with a live countdown, and a manual check button. Protected routes are gated by the new RequireVerifiedEmail guard applied via the (app) route-group layout; the home page moved into (app). NavBar surfaces a 'Verify email' link for unverified users. Firebase Auth remains the source of truth for emailVerified (no Firestore write needed). Covered by 50 passing tests (unit + component); typecheck, lint, and static export build all pass."
 }

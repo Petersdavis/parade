@@ -10,12 +10,12 @@ import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import formStyles from "@/components/auth/AuthForm.module.css";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { getAuthErrorMessage, signUpWithEmail } from "@/lib/auth";
+import { getAuthErrorMessage, sendVerificationEmail, signUpWithEmail } from "@/lib/auth";
 import { isValid, validateRegisterForm, type FieldErrors } from "@/lib/validation";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, emailVerified } = useAuth();
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,9 +30,11 @@ export default function RegisterPage() {
   // listener (which is unreliable on a static export).
   useEffect(() => {
     if (!loading && user) {
-      router.replace("/");
+      // Unverified users are sent to the verification gate; verified users
+      // continue into the app.
+      router.replace(emailVerified ? "/" : "/verify-email");
     }
-  }, [loading, user, router]);
+  }, [loading, user, emailVerified, router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,7 +48,14 @@ export default function RegisterPage() {
 
     setSubmitting(true);
     try {
-      await signUpWithEmail(email.trim(), password, displayName.trim());
+      const credential = await signUpWithEmail(email.trim(), password, displayName.trim());
+      // Fire the verification email immediately after registration. A failure
+      // here must not block the flow — the user can resend from /verify-email.
+      try {
+        await sendVerificationEmail(credential.user);
+      } catch (error) {
+        console.error("Failed to send verification email", error);
+      }
       // The auth listener above performs the redirect; keep the button in its
       // pending state until navigation occurs.
     } catch (error) {
