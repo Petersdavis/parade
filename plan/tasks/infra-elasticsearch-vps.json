@@ -2,7 +2,7 @@
   "id": "infra-elasticsearch-vps",
   "title": "Stand up Elasticsearch on a low-cost VPS",
   "phase": "infra",
-  "status": "pending",
+  "status": "done",
   "requirements": [
     "Provision a Hetzner CX22 (or equivalent ~2GB RAM) VPS.",
     "Run Elasticsearch via Docker Compose with persistent volume.",
@@ -16,5 +16,5 @@
     "infra/elasticsearch/setup.sh"
   ],
   "depends_on": [],
-  "notes": ""
+  "notes": "Deployed on an OVHcloud VPS (Ubuntu, x86_64, public IP 51.161.103.215) instead of Hetzner. Elasticsearch 8.15.3 runs via Docker Compose with a persistent es-data volume, TLS (CA + node cert via elasticsearch-certutil), and xpack security (elastic user + password). The HTTP port is bound to the WireGuard address 10.8.0.1:9200 so it is reachable ONLY over the VPN, never on the public IP. WireGuard server runs on the VPS at 10.8.0.1/24 (UDP 51820); the server private key is persisted to /etc/wireguard/wg0.key (root-only, mode 600) and embedded into /etc/wireguard/wg0.conf (chmod 600). Host firewall (ufw) allows SSH + UDP 51820 and explicitly denies 9200/tcp. Verified end-to-end: laptop WireGuard client (10.8.0.2) -> tunnel -> https://10.8.0.1:9200/_cluster/health returns status=green. Files: docker-compose.yml, elasticsearch.yml, setup.sh, .env.example, .gitignore, README.md. Known follow-ups: (1) restrict SSH via ADMIN_SSH_CIDR; (2) Firebase Functions cannot run WireGuard directly (Cloud Run/serverless) so a small always-on egress proxy is needed - tracked as a new task. Gotchas fixed during setup: ES container runs as uid 1000 so certs must be chown 1000:0; wg-quick requires the literal base64 key (not a file path) in PrivateKey; wg-quick up fails with 'wg0 already exists' unless the interface is brought down first; running wg-quick inside the snap-confined VS Code terminal segfaults due to AppArmor denying raw netlink sockets."
 }

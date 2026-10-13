@@ -1,0 +1,8 @@
+# Secrets — never commit
+.env
+
+# Generated TLS material
+certs/
+
+# Local runtime data (should live on the VPS volume, not in git)
+data/

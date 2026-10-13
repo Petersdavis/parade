@@ -1,7 +1,13 @@
 {
   "project": "parade",
   "description": "Co-parenting and co-habitation matchmaking platform for single mothers. Stack: Next.js frontend, Firebase (Auth, Firestore, Functions, Storage, FCM) backend, Elasticsearch on a low-cost VPS for matching.",
-  "status_values": ["pending", "in_progress", "blocked", "review", "done"],
+  "status_values": [
+    "pending",
+    "in_progress",
+    "blocked",
+    "review",
+    "done"
+  ],
   "tasks": [
     {
       "id": "infra-firebase-project",
@@ -28,7 +34,7 @@
       "id": "infra-elasticsearch-vps",
       "title": "Stand up Elasticsearch on a low-cost VPS",
       "phase": "infra",
-      "status": "pending",
+      "status": "done",
       "requirements": [
         "Provision a Hetzner CX22 (or equivalent ~2GB RAM) VPS.",
         "Run Elasticsearch via Docker Compose with persistent volume.",
@@ -60,7 +66,9 @@
         "infra/**",
         "infra/dns.md"
       ],
-      "depends_on": ["infra-firebase-project"],
+      "depends_on": [
+        "infra-firebase-project"
+      ],
       "notes": ""
     },
     {
@@ -81,7 +89,9 @@
         "frontend/src/app/layout.tsx",
         "frontend/src/lib/firebase.ts"
       ],
-      "depends_on": ["infra-firebase-project"],
+      "depends_on": [
+        "infra-firebase-project"
+      ],
       "notes": ""
     },
     {
@@ -102,7 +112,9 @@
         "frontend/src/components/auth/**",
         "frontend/src/lib/auth.ts"
       ],
-      "depends_on": ["frontend-bootstrap"],
+      "depends_on": [
+        "frontend-bootstrap"
+      ],
       "notes": ""
     },
     {
@@ -121,7 +133,9 @@
         "frontend/src/components/auth/**",
         "frontend/src/lib/auth.ts"
       ],
-      "depends_on": ["auth-registration"],
+      "depends_on": [
+        "auth-registration"
+      ],
       "notes": ""
     },
     {
@@ -141,7 +155,10 @@
         "functions/src/identity/**",
         "frontend/src/components/auth/**"
       ],
-      "depends_on": ["auth-email-verification", "infra-firebase-project"],
+      "depends_on": [
+        "auth-email-verification",
+        "infra-firebase-project"
+      ],
       "notes": ""
     },
     {
@@ -159,7 +176,9 @@
         "functions/src/geofence/**",
         "frontend/src/lib/geo.ts"
       ],
-      "depends_on": ["auth-registration"],
+      "depends_on": [
+        "auth-registration"
+      ],
       "notes": ""
     },
     {
@@ -178,7 +197,9 @@
         "frontend/src/middleware.ts",
         "functions/src/auth/**"
       ],
-      "depends_on": ["auth-registration"],
+      "depends_on": [
+        "auth-registration"
+      ],
       "notes": ""
     },
     {
@@ -197,7 +218,9 @@
         "frontend/src/app/(auth)/reset-password/page.tsx",
         "frontend/src/lib/auth.ts"
       ],
-      "depends_on": ["auth-registration"],
+      "depends_on": [
+        "auth-registration"
+      ],
       "notes": ""
     },
     {
@@ -215,7 +238,10 @@
         "frontend/src/app/(app)/settings/privacy/page.tsx",
         "functions/src/privacy/**"
       ],
-      "depends_on": ["auth-session-management", "infra-elasticsearch-vps"],
+      "depends_on": [
+        "auth-session-management",
+        "infra-elasticsearch-vps"
+      ],
       "notes": ""
     },
     {
@@ -233,7 +259,9 @@
         "frontend/src/app/(app)/profile/create/page.tsx",
         "frontend/src/components/profile/**"
       ],
-      "depends_on": ["auth-session-management"],
+      "depends_on": [
+        "auth-session-management"
+      ],
       "notes": ""
     },
     {
@@ -252,7 +280,9 @@
         "functions/src/search/mapping.json",
         "shared/types/profile.ts"
       ],
-      "depends_on": ["infra-elasticsearch-vps"],
+      "depends_on": [
+        "infra-elasticsearch-vps"
+      ],
       "notes": ""
     },
     {
@@ -271,7 +301,9 @@
         "frontend/src/components/profile/PhotoUpload.tsx",
         "functions/src/storage/**"
       ],
-      "depends_on": ["profile-wizard"],
+      "depends_on": [
+        "profile-wizard"
+      ],
       "notes": ""
     },
     {
@@ -289,7 +321,9 @@
         "frontend/src/components/profile/HousingPreference.tsx",
         "shared/types/profile.ts"
       ],
-      "depends_on": ["profile-schema"],
+      "depends_on": [
+        "profile-schema"
+      ],
       "notes": ""
     },
     {
@@ -306,7 +340,9 @@
         "frontend/src/components/profile/Lifestyle.tsx",
         "shared/types/profile.ts"
       ],
-      "depends_on": ["profile-schema"],
+      "depends_on": [
+        "profile-schema"
+      ],
       "notes": ""
     },
     {
@@ -324,7 +360,9 @@
         "frontend/src/components/profile/ChildrenPets.tsx",
         "shared/types/profile.ts"
       ],
-      "depends_on": ["profile-schema"],
+      "depends_on": [
+        "profile-schema"
+      ],
       "notes": ""
     },
     {
@@ -342,7 +380,10 @@
         "frontend/src/app/(app)/discover/page.tsx",
         "frontend/src/components/search/**"
       ],
-      "depends_on": ["profile-wizard", "profile-schema"],
+      "depends_on": [
+        "profile-wizard",
+        "profile-schema"
+      ],
       "notes": ""
     },
     {
@@ -360,7 +401,9 @@
         "frontend/src/app/(app)/discover/page.tsx",
         "frontend/src/components/discovery/**"
       ],
-      "depends_on": ["matching-search-ui"],
+      "depends_on": [
+        "matching-search-ui"
+      ],
       "notes": ""
     },
     {
@@ -379,7 +422,10 @@
         "functions/src/matching/**",
         "shared/types/matching.ts"
       ],
-      "depends_on": ["profile-schema", "infra-elasticsearch-vps"],
+      "depends_on": [
+        "profile-schema",
+        "infra-elasticsearch-vps"
+      ],
       "notes": ""
     },
     {
@@ -397,7 +443,9 @@
         "frontend/src/components/search/SavedSearches.tsx",
         "functions/src/notifications/**"
       ],
-      "depends_on": ["matching-search-ui"],
+      "depends_on": [
+        "matching-search-ui"
+      ],
       "notes": ""
     },
     {
@@ -415,7 +463,9 @@
         "frontend/src/components/discovery/**",
         "functions/src/matching/**"
       ],
-      "depends_on": ["matching-discovery"],
+      "depends_on": [
+        "matching-discovery"
+      ],
       "notes": ""
     },
     {
@@ -433,7 +483,9 @@
         "functions/src/matching/**",
         "frontend/src/app/(app)/matches/page.tsx"
       ],
-      "depends_on": ["matching-like-pass"],
+      "depends_on": [
+        "matching-like-pass"
+      ],
       "notes": ""
     },
     {
@@ -451,7 +503,9 @@
         "frontend/src/components/moderation/**",
         "functions/src/moderation/**"
       ],
-      "depends_on": ["matching-discovery"],
+      "depends_on": [
+        "matching-discovery"
+      ],
       "notes": ""
     },
     {
@@ -470,7 +524,9 @@
         "frontend/src/lib/chat.ts",
         "firestore.rules"
       ],
-      "depends_on": ["matching-mutual-detection"],
+      "depends_on": [
+        "matching-mutual-detection"
+      ],
       "notes": ""
     },
     {
@@ -488,7 +544,9 @@
         "frontend/src/app/(app)/messages/page.tsx",
         "frontend/src/components/messaging/**"
       ],
-      "depends_on": ["messaging-realtime-chat"],
+      "depends_on": [
+        "messaging-realtime-chat"
+      ],
       "notes": ""
     },
     {
@@ -506,7 +564,9 @@
         "frontend/src/components/messaging/**",
         "frontend/src/lib/chat.ts"
       ],
-      "depends_on": ["messaging-inbox"],
+      "depends_on": [
+        "messaging-inbox"
+      ],
       "notes": ""
     },
     {
@@ -524,7 +584,9 @@
         "frontend/src/components/messaging/Attachment.tsx",
         "functions/src/storage/**"
       ],
-      "depends_on": ["messaging-realtime-chat"],
+      "depends_on": [
+        "messaging-realtime-chat"
+      ],
       "notes": ""
     },
     {
@@ -542,7 +604,10 @@
         "frontend/src/components/messaging/**",
         "functions/src/moderation/**"
       ],
-      "depends_on": ["messaging-realtime-chat", "matching-block-report"],
+      "depends_on": [
+        "messaging-realtime-chat",
+        "matching-block-report"
+      ],
       "notes": ""
     },
     {
@@ -560,7 +625,9 @@
         "functions/src/notifications/**",
         "frontend/src/lib/notifications.ts"
       ],
-      "depends_on": ["messaging-realtime-chat"],
+      "depends_on": [
+        "messaging-realtime-chat"
+      ],
       "notes": ""
     },
     {
@@ -578,7 +645,9 @@
         "frontend/src/components/messaging/Icebreakers.tsx",
         "shared/data/icebreakers.ts"
       ],
-      "depends_on": ["messaging-realtime-chat"],
+      "depends_on": [
+        "messaging-realtime-chat"
+      ],
       "notes": ""
     },
     {
@@ -597,7 +666,11 @@
         "functions/src/search/sync.ts",
         "functions/src/index.ts"
       ],
-      "depends_on": ["profile-schema", "infra-elasticsearch-vps", "infra-firebase-project"],
+      "depends_on": [
+        "profile-schema",
+        "infra-elasticsearch-vps",
+        "infra-firebase-project"
+      ],
       "notes": ""
     },
     {
@@ -616,7 +689,9 @@
         "functions/**",
         "docs/functions-cost.md"
       ],
-      "depends_on": ["functions-es-sync"],
+      "depends_on": [
+        "functions-es-sync"
+      ],
       "notes": ""
     }
   ]

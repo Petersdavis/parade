@@ -1,0 +1,96 @@
+# Parade — Elasticsearch single-node deployment
+#
+# Target host: OVHcloud VPS (Ubuntu, ~2 GB RAM) or any equivalent box
+# (e.g. Hetzner CX22).
+#
+# Security model:
+#   - Elasticsearch security is ENABLED (TLS + username/password auth).
+#   - The HTTP port is bound to the WireGuard interface address (10.8.0.1) so
+#     it is reachable ONLY over the VPN, never on the public IP. Binding to
+#     127.0.0.1 would NOT work: traffic arriving on wg0 is destined for
+#     10.8.0.1, not loopback.
+#   - Firebase Functions reach the cluster over the VPN tunnel only.
+#
+# Usage:
+#   cp .env.example .env   # then fill in secrets
+#   docker compose up -d
+#   docker compose logs -f elasticsearch
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    container_name: parade-elasticsearch
+    restart: unless-stopped
+
+    environment:
+      # --- Cluster identity ---
+      - cluster.name=parade-es
+      - node.name=parade-es-node-1
+      - discovery.type=single-node
+
+      # --- Resource limits (tuned for a ~2 GB RAM box) ---
+      # Keep the JVM heap at ~50% of container memory, capped at 1 GB.
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - bootstrap.memory_lock=true
+
+      # --- Security ---
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/es01/es01.key
+      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es01/es01.key
+      - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+
+      # Bootstrap password is only used on first start to seed the keystore.
+      # Change it immediately afterwards (see setup.sh).
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:?set ELASTIC_PASSWORD in .env}
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+      - ./certs:/usr/share/elasticsearch/config/certs:ro
+      - ./elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+
+    ports:
+      # Bind address is configurable via ES_BIND_ADDRESS in .env:
+      #   - 10.8.0.1  -> reachable only over the WireGuard VPN (default, private)
+      #   - 0.0.0.0   -> reachable on the public IP. Safe ONLY because the node
+      #                  requires mutual TLS (client certs) + password auth.
+      #                  Use this for serverless clients (Firebase Functions)
+      #                  that cannot run a WireGuard client.
+      # Do NOT use 127.0.0.1: wg0 traffic targets 10.8.0.1, so a loopback bind
+      # would be unreachable over the VPN.
+      - "${ES_BIND_ADDRESS:-10.8.0.1}:9200:9200"
+
+    networks:
+      - parade-es
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sS --cacert config/certs/ca/ca.crt -u elastic:$${ELASTIC_PASSWORD} https://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"'",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+volumes:
+  es-data:
+    driver: local
+
+networks:
+  parade-es:
+    driver: bridge
