@@ -13,8 +13,6 @@
     "frontend/src/app/(app)/profile/create/page.tsx",
     "frontend/src/components/profile/**"
   ],
-  "depends_on": [
-    "auth-session-management"
-  ],
+  "depends_on": [],
   "notes": ""
 }

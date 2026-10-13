@@ -14,7 +14,6 @@
 - [ ] Email verification flow
 - [ ] Identity verification (government ID upload, background check integration)
 - [ ] IP geofencing — flag users connecting from outside the community's geographic region as non-local
-- [ ] Session management (JWT or cookie-based)
 - [ ] Password reset flow
 - [ ] Account deletion and data privacy controls
 
