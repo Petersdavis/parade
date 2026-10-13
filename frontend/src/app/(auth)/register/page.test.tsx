@@ -4,12 +4,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import RegisterPage from "./page";
 
-const push = vi.fn();
+const replace = vi.fn();
 const signUpWithEmail = vi.fn();
 const signInWithGoogle = vi.fn();
+const useAuth = vi.fn();
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push }),
+  useRouter: () => ({ replace }),
+}));
+
+vi.mock("@/components/auth/AuthProvider", () => ({
+  useAuth: () => useAuth(),
 }));
 
 vi.mock("@/lib/auth", async () => {
@@ -23,9 +28,12 @@ vi.mock("@/lib/auth", async () => {
 
 describe("RegisterPage", () => {
   beforeEach(() => {
-    push.mockReset();
+    replace.mockReset();
     signUpWithEmail.mockReset();
     signInWithGoogle.mockReset();
+    useAuth.mockReset();
+    // Default: signed out, auth state resolved.
+    useAuth.mockReturnValue({ user: null, loading: false });
   });
 
   it("renders the registration form", () => {
@@ -63,7 +71,7 @@ describe("RegisterPage", () => {
     expect(signUpWithEmail).not.toHaveBeenCalled();
   });
 
-  it("submits a valid form and redirects home", async () => {
+  it("submits a valid form and lets the auth listener redirect", async () => {
     const user = userEvent.setup();
     signUpWithEmail.mockResolvedValue({ user: { uid: "abc" } });
     render(<RegisterPage />);
@@ -77,7 +85,22 @@ describe("RegisterPage", () => {
     await waitFor(() => {
       expect(signUpWithEmail).toHaveBeenCalledWith("jane@example.com", "longenough", "Jane");
     });
-    expect(push).toHaveBeenCalledWith("/");
+    // The redirect is driven by auth state, not an imperative push.
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it("redirects home once the auth state reports a signed-in user", () => {
+    useAuth.mockReturnValue({ user: { uid: "abc" }, loading: false });
+    render(<RegisterPage />);
+
+    expect(replace).toHaveBeenCalledWith("/");
+  });
+
+  it("does not redirect while auth state is still loading", () => {
+    useAuth.mockReturnValue({ user: null, loading: true });
+    render(<RegisterPage />);
+
+    expect(replace).not.toHaveBeenCalled();
   });
 
   it("surfaces a friendly message when sign-up fails", async () => {
@@ -92,10 +115,10 @@ describe("RegisterPage", () => {
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(/already exists/i);
-    expect(push).not.toHaveBeenCalled();
+    expect(replace).not.toHaveBeenCalled();
   });
 
-  it("signs in with Google and redirects home", async () => {
+  it("signs in with Google and lets the auth listener redirect", async () => {
     const user = userEvent.setup();
     signInWithGoogle.mockResolvedValue({ user: { uid: "abc" } });
     render(<RegisterPage />);
@@ -103,6 +126,6 @@ describe("RegisterPage", () => {
     await user.click(screen.getByRole("button", { name: /continue with google/i }));
 
     await waitFor(() => expect(signInWithGoogle).toHaveBeenCalled());
-    expect(push).toHaveBeenCalledWith("/");
+    expect(replace).not.toHaveBeenCalled();
   });
 });
