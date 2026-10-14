@@ -38,8 +38,24 @@ export interface UserProfile {
   photoURL: string | null;
   /** Auth providers linked to the account, e.g. ["password", "google.com"]. */
   providers: string[];
+  /** Given name captured during waitlist profile completion. */
+  firstName?: string | null;
+  /** Family name captured during waitlist profile completion. */
+  lastName?: string | null;
+  /** Canonical Ontario community id the user is joining the waitlist for. */
+  community?: string | null;
+  /** True once the user has completed the basic waitlist profile form. */
+  profileComplete?: boolean;
   createdAt: unknown;
   updatedAt: unknown;
+}
+
+/** Fields captured by the waitlist profile-completion form. */
+export interface ProfileInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  community: string;
 }
 
 /** OAuth providers supported by the registration/login UI. */
@@ -100,6 +116,63 @@ async function ensureUserProfileSafely(user: User): Promise<void> {
   } catch (error) {
     console.error("Failed to provision user profile document", error);
   }
+}
+
+/**
+ * Persist the basic waitlist profile captured after registration.
+ *
+ * Writes the profile fields and flips `profileComplete` to true so the workflow
+ * can route the user on to the leaderboard. Also mirrors the name onto the
+ * Firebase Auth profile (best-effort) so it is available without a Firestore
+ * read. Throws on failure so the form can surface an error and let the user
+ * retry.
+ */
+export async function saveUserProfile(user: User, input: ProfileInput): Promise<void> {
+  const db = getFirebaseFirestore();
+  const ref = doc(db, USERS_COLLECTION, user.uid);
+  const firstName = input.firstName.trim();
+  const lastName = input.lastName.trim();
+  const displayName = [firstName, lastName].filter(Boolean).join(" ");
+
+  await setDoc(
+    ref,
+    {
+      uid: user.uid,
+      email: input.email.trim() || user.email,
+      firstName,
+      lastName,
+      displayName,
+      community: input.community.trim(),
+      profileComplete: true,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
+
+  // Keep the Auth display name in sync so it is available without a read.
+  if (displayName && displayName !== user.displayName) {
+    try {
+      await updateProfile(user, { displayName });
+    } catch (error) {
+      console.error("Failed to update auth display name", error);
+    }
+  }
+}
+
+/**
+ * Read the `users/{uid}` profile document, or null when it does not exist.
+ *
+ * Used by the workflow to decide whether a signed-in user still needs to
+ * complete their basic profile before reaching the leaderboard.
+ */
+export async function fetchUserProfile(user: User): Promise<UserProfile | null> {
+  const db = getFirebaseFirestore();
+  const ref = doc(db, USERS_COLLECTION, user.uid);
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) {
+    return null;
+  }
+  return snapshot.data() as UserProfile;
 }
 
 /** Sign up with email + password, then create the profile document. */

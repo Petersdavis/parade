@@ -48,6 +48,28 @@ export function validateDisplayName(name: string): string | undefined {
   return undefined;
 }
 
+export function validateFirstName(name: string): string | undefined {
+  const value = name.trim();
+  if (!value) {
+    return "First name is required.";
+  }
+  if (value.length < 2) {
+    return "First name must be at least 2 characters.";
+  }
+  return undefined;
+}
+
+export function validateLastName(name: string): string | undefined {
+  const value = name.trim();
+  if (!value) {
+    return "Last name is required.";
+  }
+  if (value.length < 2) {
+    return "Last name must be at least 2 characters.";
+  }
+  return undefined;
+}
+
 export function validateConfirmPassword(
   password: string,
   confirmPassword: string,
@@ -92,6 +114,71 @@ export function validateLoginForm(input: LoginInput): FieldErrors {
     password: input.password ? undefined : "Password is required.",
   };
   return pruneEmpty(errors);
+}
+
+export interface ProfileInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  community: string;
+}
+
+/**
+ * Validate the waitlist profile-completion form.
+ *
+ * `community` must be one of the canonical Ontario community ids; the caller
+ * passes the set of valid ids so this module stays free of the community data.
+ */
+export function validateProfileForm(
+  input: ProfileInput,
+  isCanonicalCommunity: (id: string) => boolean,
+): FieldErrors {
+  const errors: FieldErrors = {
+    firstName: validateFirstName(input.firstName),
+    lastName: validateLastName(input.lastName),
+    email: validateEmail(input.email),
+    community: validateCommunity(input.community, isCanonicalCommunity),
+  };
+  return pruneEmpty(errors);
+}
+
+export interface WaitlistInput {
+  name: string;
+  email: string;
+  community: string;
+}
+
+/**
+ * Validate the waitlist signup form.
+ *
+ * `community` must be one of the canonical Ontario community ids; the caller
+ * passes the set of valid ids so this module stays free of the community data.
+ */
+export function validateWaitlistForm(
+  input: WaitlistInput,
+  isCanonicalCommunity: (id: string) => boolean,
+): FieldErrors {
+  const errors: FieldErrors = {
+    name: validateDisplayName(input.name),
+    email: validateEmail(input.email),
+    community: validateCommunity(input.community, isCanonicalCommunity),
+  };
+  return pruneEmpty(errors);
+}
+
+/** Validate that a community value is one of the canonical options. */
+export function validateCommunity(
+  community: string,
+  isCanonicalCommunity: (id: string) => boolean,
+): string | undefined {
+  const value = community.trim();
+  if (!value) {
+    return "Please choose your community.";
+  }
+  if (!isCanonicalCommunity(value)) {
+    return "Please choose a community from the list.";
+  }
+  return undefined;
 }
 
 /** True when a validation result contains no errors. */

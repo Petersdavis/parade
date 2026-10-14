@@ -1,0 +1,24 @@
+{
+  "id": "launch-landing-page",
+  "title": "MVP waitlist landing page",
+  "phase": "step-0-launch",
+  "status": "review",
+  "requirements": [
+    "Build a public landing page (route `/`) that describes Parade's purpose for single mothers in Ontario seeking co-parenting and co-habitation matches.",
+    "The landing page is the only public surface: it must allow registration (join the waitlist) and nothing else — no discovery, matching, messaging, or profile features are reachable.",
+    "Include a clear value proposition, how-it-works summary, and a prominent call-to-action to join the waitlist.",
+    "Be fully responsive and accessible (semantic landmarks, keyboard navigable, WCAG AA contrast).",
+    "Include SEO metadata (title, description, Open Graph/Twitter cards) and a shareable canonical URL.",
+    "Preserve the existing static-export build (`output: \"export\"`) and pass typecheck, lint, and build."
+  ],
+  "context": [
+    "frontend/src/app/page.tsx",
+    "frontend/src/app/(marketing)/**",
+    "frontend/src/components/marketing/**",
+    "frontend/src/app/layout.tsx"
+  ],
+  "depends_on": [
+    "frontend-bootstrap"
+  ],
+  "notes": "Implemented as a new public `(marketing)` route group. The old protected home page at `(app)/page.tsx` was removed so `/` is now the public landing page; the `(app)` group remains for protected routes. Added `(marketing)/layout.tsx` (no app chrome) and `(marketing)/page.tsx` with full SEO metadata (title, description, canonical via `lib/site.ts`, Open Graph, Twitter summary_large_image). New components: `components/marketing/LandingHero.tsx` (value prop + primary CTA) and `components/marketing/HowItWorks.tsx` (3-step summary). Every CTA links to `/waitlist`; no protected routes are reachable. Added `lib/site.ts` (SITE_URL from NEXT_PUBLIC_SITE_URL, canonicalUrl helper) and `lib/ontario-communities.ts` (canonical Ontario community list, shared with the waitlist task). Tests: `(marketing)/page.test.tsx` (4) and `lib/ontario-communities.test.ts` (10). Typecheck and tests pass. NOTE: `NEXT_PUBLIC_SITE_URL` should be set in the deploy environment for the canonical/OG URLs to point at the production domain."
+}

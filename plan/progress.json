@@ -10,6 +10,83 @@
   ],
   "tasks": [
     {
+      "id": "launch-landing-page",
+      "title": "MVP waitlist landing page",
+      "phase": "step-0-launch",
+      "status": "review",
+      "requirements": [
+        "Build a public landing page (route `/`) that describes Parade's purpose for single mothers in Ontario seeking co-parenting and co-habitation matches.",
+        "The landing page is the only public surface: it must allow registration (join the waitlist) and nothing else — no discovery, matching, messaging, or profile features are reachable.",
+        "Include a clear value proposition, how-it-works summary, and a prominent call-to-action to join the waitlist.",
+        "Be fully responsive and accessible (semantic landmarks, keyboard navigable, WCAG AA contrast).",
+        "Include SEO metadata (title, description, Open Graph/Twitter cards) and a shareable canonical URL.",
+        "Preserve the existing static-export build (`output: \"export\"`) and pass typecheck, lint, and build."
+      ],
+      "context": [
+        "frontend/src/app/page.tsx",
+        "frontend/src/app/(marketing)/**",
+        "frontend/src/components/marketing/**",
+        "frontend/src/app/layout.tsx"
+      ],
+      "depends_on": [
+        "frontend-bootstrap"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "launch-waitlist-signup",
+      "title": "Ontario waitlist signup with community selection",
+      "phase": "step-0-launch",
+      "status": "review",
+      "requirements": [
+        "Provide a waitlist signup form reachable from the landing page that captures name, email, and community.",
+        "Community is a required combo box (typeahead + dropdown) populated from a canonical list of major Ontario regions/communities (e.g. Toronto, Peel, York, Durham, Halton, Hamilton, Ottawa, Waterloo, London, Windsor, Niagara, Simcoe/Muskoka, Kingston, Sudbury, Thunder Bay).",
+        "Validate all inputs client-side (valid email, non-empty name, community must be one of the canonical options) and surface clear inline errors.",
+        "Persist signups to Firestore in a `waitlist` collection with normalized community id, timestamp, and source/referral metadata; never store secrets client-side.",
+        "Enforce Firestore security rules so waitlist documents are write-only from the client and not publicly readable.",
+        "Prevent duplicate signups for the same email and show a friendly confirmation state after submission.",
+        "Cover the form and validation logic with component/unit tests."
+      ],
+      "context": [
+        "frontend/src/app/(marketing)/waitlist/**",
+        "frontend/src/components/marketing/WaitlistForm.tsx",
+        "frontend/src/lib/waitlist.ts",
+        "frontend/src/lib/ontario-communities.ts",
+        "firestore.rules"
+      ],
+      "depends_on": [
+        "launch-landing-page",
+        "auth-registration"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "launch-community-leaderboard",
+      "title": "Community signup leaderboard and share link",
+      "phase": "step-0-launch",
+      "status": "review",
+      "requirements": [
+        "After a successful waitlist signup, show a leaderboard of Ontario communities ranked by total signup counts.",
+        "Highlight the community the user selected and show its current rank and count.",
+        "Provide a share link (with referral/community attribution) and social share actions (e.g. X/Twitter, Facebook, WhatsApp, copy link) so users can invite others.",
+        "Aggregate counts server-side (Firestore aggregation or a scheduled/triggered Cloud Function) so the client never reads the full waitlist collection.",
+        "Expose a read-only public endpoint/collection for aggregate counts that does not leak individual signup data.",
+        "Handle empty/loading/error states and keep the leaderboard responsive on mobile.",
+        "Cover the leaderboard rendering and share-link generation with tests."
+      ],
+      "context": [
+        "frontend/src/app/(marketing)/waitlist/leaderboard/**",
+        "frontend/src/components/marketing/CommunityLeaderboard.tsx",
+        "frontend/src/lib/waitlist.ts",
+        "functions/src/waitlist/**",
+        "firestore.rules"
+      ],
+      "depends_on": [
+        "launch-waitlist-signup"
+      ],
+      "notes": ""
+    },
+    {
       "id": "infra-firebase-project",
       "title": "Provision Firebase project and environments",
       "phase": "infra",

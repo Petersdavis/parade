@@ -4,6 +4,12 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // User profile documents. A user may read and write only their own
     // document, and the document id must match their auth uid.
+    //
+    // The `users/{uid}` document is the single canonical record of a user's
+    // waitlist membership: their profile fields and their `community` live here.
+    // All client-side edits (registration, profile completion, community
+    // changes) are written to this document. The community leaderboard is
+    // derived from it server-side — see `waitlistCounts` below.
     match /users/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;
       allow create: if request.auth != null
@@ -15,17 +21,21 @@ service cloud.firestore {
       allow delete: if request.auth != null && request.auth.uid == userId;
     }
 
+    // Public, read-only aggregate counts per community, powering the community
+    // leaderboard. Populated server-side by the `onUserCommunityChanged` and
+    // `recomputeWaitlistCounts` Cloud Functions (see
+    // `functions/src/waitlist/aggregateCounts.ts`), which aggregate the
+    // `users` collection. Contains only a community id and a total count — no
+    // personal data — so it is safe to read publicly. Clients may never write
+    // here, even to their own community's document.
+    match /waitlistCounts/{communityId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 11, 12);
+      // Deny by default. Every collection must have an explicit rule above.
+      allow read, write: if false;
     }
   }
 }

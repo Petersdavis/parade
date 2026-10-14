@@ -9,9 +9,11 @@ const signUpWithEmail = vi.fn();
 const signInWithGoogle = vi.fn();
 const sendVerificationEmail = vi.fn();
 const useAuth = vi.fn();
+const searchParams = new URLSearchParams();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace }),
+  useSearchParams: () => searchParams,
 }));
 
 vi.mock("@/components/auth/AuthProvider", () => ({
@@ -36,8 +38,11 @@ describe("RegisterPage", () => {
     sendVerificationEmail.mockReset();
     sendVerificationEmail.mockResolvedValue(undefined);
     useAuth.mockReset();
-    // Default: signed out, auth state resolved.
+    // Default: signed out, auth state resolved, no referral param.
     useAuth.mockReturnValue({ user: null, loading: false, emailVerified: false });
+    for (const key of [...searchParams.keys()]) {
+      searchParams.delete(key);
+    }
   });
 
   it("renders the registration form", () => {
@@ -97,18 +102,18 @@ describe("RegisterPage", () => {
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it("redirects unverified users to the verification gate", () => {
+  it("redirects signed-in users into the waitlist profile step", () => {
     useAuth.mockReturnValue({ user: { uid: "abc" }, loading: false, emailVerified: false });
     render(<RegisterPage />);
 
-    expect(replace).toHaveBeenCalledWith("/verify-email");
+    expect(replace).toHaveBeenCalledWith("/profile");
   });
 
-  it("redirects verified users home", () => {
+  it("redirects verified users into the waitlist profile step too", () => {
     useAuth.mockReturnValue({ user: { uid: "abc" }, loading: false, emailVerified: true });
     render(<RegisterPage />);
 
-    expect(replace).toHaveBeenCalledWith("/");
+    expect(replace).toHaveBeenCalledWith("/profile");
   });
 
   it("does not redirect while auth state is still loading", () => {

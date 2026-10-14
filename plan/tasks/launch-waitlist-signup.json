@@ -1,0 +1,27 @@
+{
+  "id": "launch-waitlist-signup",
+  "title": "Ontario waitlist signup with community selection",
+  "phase": "step-0-launch",
+  "status": "review",
+  "requirements": [
+    "Provide a waitlist signup form reachable from the landing page that captures name, email, and community.",
+    "Community is a required combo box (typeahead + dropdown) populated from a canonical list of major Ontario regions/communities (e.g. Toronto, Peel, York, Durham, Halton, Hamilton, Ottawa, Waterloo, London, Windsor, Niagara, Simcoe/Muskoka, Kingston, Sudbury, Thunder Bay).",
+    "Validate all inputs client-side (valid email, non-empty name, community must be one of the canonical options) and surface clear inline errors.",
+    "Persist signups to Firestore in a `waitlist` collection with normalized community id, timestamp, and source/referral metadata; never store secrets client-side.",
+    "Enforce Firestore security rules so waitlist documents are write-only from the client and not publicly readable.",
+    "Prevent duplicate signups for the same email and show a friendly confirmation state after submission.",
+    "Cover the form and validation logic with component/unit tests."
+  ],
+  "context": [
+    "frontend/src/app/(marketing)/waitlist/**",
+    "frontend/src/components/marketing/WaitlistForm.tsx",
+    "frontend/src/lib/waitlist.ts",
+    "frontend/src/lib/ontario-communities.ts",
+    "firestore.rules"
+  ],
+  "depends_on": [
+    "launch-landing-page",
+    "auth-registration"
+  ],
+  "notes": "Added `lib/waitlist.ts` (submitWaitlistSignup, normalizeEmail, waitlistDocId, WaitlistValidationError). Duplicate prevention uses a deterministic document id derived from the normalized email, so a repeat signup returns { status: 'duplicate' } without writing. Signups persist email, name, canonical community id, source, referralCommunity, and a server timestamp. Added `components/marketing/CommunityCombobox.tsx` (ARIA combobox: typeahead, arrow-key nav, Enter/Escape, click-outside close) and `components/marketing/WaitlistForm.tsx` (validation + confirmation/duplicate states). Page at `(marketing)/waitlist/page.tsx` with a `WaitlistReferral` client component reading `?ref=` for referral attribution (wrapped in Suspense for static export). Extended `lib/validation.ts` with validateWaitlistForm/validateCommunity. Firestore rules: `waitlist` is create-only from the client (validated shape via isValidWaitlistSignup) and never readable; added a public read-only `waitlistCounts` collection for aggregates; default-deny catch-all. Tests: `lib/waitlist.test.ts` (7), `lib/validation.test.ts` (+6), `components/marketing/WaitlistForm.test.tsx` (7). Typecheck and tests pass."
+}
