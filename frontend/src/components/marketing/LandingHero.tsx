@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/Button";
+import { PrimaryCta } from "./PrimaryCta";
 
 import styles from "./LandingHero.module.css";
 
@@ -23,7 +23,7 @@ export function LandingHero() {
                 find more than a roommate — it helps them find their village.
             </p>
             <div className={styles.actions}>
-                <Button href="/register">Join the waitlist</Button>
+                <PrimaryCta />
             </div>
             <p className={styles.note}>Free to join. Early access to a more intentional way to build home.</p>
         </section>

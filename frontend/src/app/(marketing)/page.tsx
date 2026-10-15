@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { LandingHero } from "@/components/marketing/LandingHero";
-import { Button } from "@/components/ui/Button";
+import { PrimaryCta } from "@/components/marketing/PrimaryCta";
 import { canonicalUrl, SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -40,14 +40,14 @@ export default function LandingPage() {
     <>
       <LandingHero />
       <HowItWorks />
-      <section aria-labelledby="final-cta-heading" className="stack">
-        <h2 id="final-cta-heading">Find your village</h2>
-        <p>
-          Parade is opening community by community across Ontario. Join the waitlist to be among
-          the first mothers matched into a supportive home and a collaborative parenting network.
-        </p>
-        <Button href="/register">Join the waitlist</Button>
-      </section>
+        <section aria-labelledby="final-cta-heading" className="stack">
+          <h2 id="final-cta-heading">Find your village</h2>
+          <p>
+            Parade is opening community by community across Ontario. Join the waitlist to be among
+            the first mothers matched into a supportive home and a collaborative parenting network.
+          </p>
+        <PrimaryCta />
+        </section>
     </>
   );
 }
