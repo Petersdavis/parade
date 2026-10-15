@@ -31,27 +31,40 @@ describe("CommunityLeaderboard", () => {
         expect(screen.getByText(/loading the community leaderboard/i)).toBeInTheDocument();
     });
 
+    it("renders stacked community progress bars and the coming soon badge at the cap", async () => {
+        fetchLeaderboard.mockResolvedValue([
+            { community: "ottawa", label: "Ottawa", count: 250, rank: 1 },
+            { community: "peel", label: "Peel Region", count: 100, rank: 2 },
+        ]);
+
+        render(<CommunityLeaderboard />);
+
+        expect(await screen.findAllByRole("progressbar")).toHaveLength(2);
+        expect(screen.getByRole("progressbar", { name: /ottawa: 250 \/ 250 signups/i })).toHaveAttribute(
+            "aria-valuenow",
+            "250",
+        );
+        expect(screen.getByRole("progressbar", { name: /peel region: 100 \/ 250 signups/i })).toHaveAttribute(
+            "aria-valuenow",
+            "100",
+        );
+        expect(screen.getByText(/coming soon!/i)).toBeInTheDocument();
+    });
+
     it("renders communities ranked by signup count", async () => {
         fetchLeaderboard.mockResolvedValue(RANKED);
         render(<CommunityLeaderboard />);
 
         const items = await screen.findAllByRole("listitem");
         expect(items[0]).toHaveTextContent("Ottawa");
-        expect(items[0]).toHaveTextContent("12 signups");
         expect(items[1]).toHaveTextContent("Peel Region");
     });
 
-    it("highlights the user's community with its rank and count", async () => {
+    it("marks the user's community row as current", async () => {
         fetchLeaderboard.mockResolvedValue(RANKED);
         render(<CommunityLeaderboard highlightCommunity="peel" />);
 
-        // The highlight summary shows the rank and count for the joined community.
-        const summary = await screen.findByRole("status");
-        expect(summary).toHaveTextContent("#2");
-        expect(summary).toHaveTextContent("Peel Region");
-        expect(summary).toHaveTextContent("8 signups");
-        // The matching list row is marked as the current item.
-        const current = screen.getByRole("listitem", { current: true });
+        const current = await screen.findByRole("listitem", { current: true });
         expect(current).toHaveTextContent("Peel Region");
     });
 

@@ -19,6 +19,8 @@ interface CommunityLeaderboardProps {
     highlightCommunity?: string | null;
 }
 
+const WAITLIST_CAP = 250;
+
 type LoadState = "loading" | "ready" | "error";
 
 /**
@@ -94,21 +96,10 @@ export function CommunityLeaderboard({ highlightCommunity = null }: CommunityLea
 
     return (
         <div className={styles.panel}>
-            <h2 className={styles.heading}>Community leaderboard</h2>
-            <p className={styles.muted}>
-                See which Ontario communities are closest to launching. Invite others to move yours up the
-                list.
+            <h2 className={styles.heading}>Community Leaderboard</h2>
+            <p className={styles.intro}>
+                Every signup moves a community closer to launch. Share your link to help yours climb the list.
             </p>
-
-            {highlighted ? (
-                <div className={styles.highlight} role="status">
-                    <span className={styles.highlightRank}>#{highlighted.rank}</span>
-                    <span className={styles.highlightLabel}>{highlighted.label}</span>
-                    <span className={styles.highlightCount}>
-                        {highlighted.count} {highlighted.count === 1 ? "signup" : "signups"}
-                    </span>
-                </div>
-            ) : null}
 
             {entries.length === 0 ? (
                 <p className={styles.muted}>No signups yet — be the first in your community.</p>
@@ -116,17 +107,30 @@ export function CommunityLeaderboard({ highlightCommunity = null }: CommunityLea
                 <ol className={styles.list}>
                     {entries.map((entry) => {
                         const isHighlighted = entry.community === highlightCommunity;
+                        const filled = Math.min(100, (entry.count / WAITLIST_CAP) * 100);
+                        const isComingSoon = entry.count >= WAITLIST_CAP;
                         return (
                             <li
                                 key={entry.community}
                                 className={isHighlighted ? `${styles.row} ${styles.rowHighlighted}` : styles.row}
                                 aria-current={isHighlighted ? "true" : undefined}
                             >
-                                <span className={styles.rank}>{entry.rank}</span>
-                                <span className={styles.label}>{entry.label}</span>
-                                <span className={styles.count}>
-                                    {entry.count} {entry.count === 1 ? "signup" : "signups"}
-                                </span>
+                                <div className={styles.rowHeader}>
+                                    <span className={styles.rank}>{entry.rank}</span>
+                                    <span className={styles.label}>{entry.label}</span>
+                                    <div
+                                        className={styles.progressTrack}
+                                        role="progressbar"
+                                        title={`${entry.count} / ${WAITLIST_CAP} signups`}
+                                        aria-label={`${entry.label}: ${entry.count} / ${WAITLIST_CAP} signups`}
+                                        aria-valuemin={0}
+                                        aria-valuemax={WAITLIST_CAP}
+                                        aria-valuenow={Math.min(entry.count, WAITLIST_CAP)}
+                                    >
+                                        <div className={styles.progressFill} style={{ width: `${filled}%` }} />
+                                    </div>
+                                </div>
+                                {isComingSoon ? <span className={styles.badge}>Coming soon!</span> : null}
                             </li>
                         );
                     })}

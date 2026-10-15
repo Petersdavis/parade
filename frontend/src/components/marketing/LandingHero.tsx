@@ -12,19 +12,20 @@ import styles from "./LandingHero.module.css";
 export function LandingHero() {
     return (
         <section className={styles.hero} aria-labelledby="hero-heading">
-            <p className={styles.eyebrow}>For single mothers in Ontario</p>
+            <p className={styles.eyebrow}>Inspired by elephant matriarchies</p>
             <h1 id="hero-heading" className={styles.heading}>
-                Find a co-parent and co-habitation partner you can build a home with.
+                It takes a village.
+                <span className={styles.headingAccent}>Let&apos;s build yours.</span>
             </h1>
             <p className={styles.lede}>
-                Parade connects single mothers who want to share a home, share the load, and raise their
-                children together — like an elephant parade, where mothers look after their young as a
-                community.
+                Parade connects single mothers who want to build better lives together. Through
+                intentional matching, shared housing, and collaborative parenting, Parade helps mothers
+                find more than a roommate — it helps them find their village.
             </p>
             <div className={styles.actions}>
                 <Button href="/register">Join the waitlist</Button>
             </div>
-            <p className={styles.note}>Free to join. No commitment — just early access.</p>
+            <p className={styles.note}>Free to join. Early access to a more intentional way to build home.</p>
         </section>
     );
 }
