@@ -7,19 +7,19 @@ interface Step {
 
 const STEPS: readonly Step[] = [
   {
-    title: "Join the waitlist",
+    title: "Meet Parade",
     description:
-      "Tell us your name, email, and the Ontario community you call home. It takes less than a minute.",
+      "Tell us where you live, what kind of home you are building, and the support you need to thrive.",
   },
   {
-    title: "Build your profile",
+    title: "Get intentionally matched",
     description:
-      "Share what matters to you — your housing needs, lifestyle, children, and pets — so we can find genuinely compatible matches.",
+      "Share your values, lifestyle, children, and housing needs so we can connect you with compatible mothers.",
   },
   {
-    title: "Match and meet",
+    title: "Build a shared home",
     description:
-      "Get introduced to single mothers nearby who want to co-parent and co-habitate, then start the conversation.",
+      "Move from introductions to collaborative parenting, shared housing, and a stronger support system.",
   },
 ];
 
@@ -28,7 +28,7 @@ export function HowItWorks() {
   return (
     <section className={styles.section} aria-labelledby="how-it-works-heading">
       <h2 id="how-it-works-heading" className={styles.heading}>
-        How it works
+        How Parade works
       </h2>
       <ol className={styles.steps}>
         {STEPS.map((step, index) => (

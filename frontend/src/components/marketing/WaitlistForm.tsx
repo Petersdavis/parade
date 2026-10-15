@@ -33,7 +33,11 @@ type FormState = "idle" | "submitting" | "success" | "duplicate";
  * confirmation state. Duplicate emails are treated as success (the user is
  * already on the list) rather than an error.
  */
-export function WaitlistForm({ source = "landing", referralCommunity = null, onSuccess }: WaitlistFormProps) {
+export function WaitlistForm({
+    source = "landing",
+    referralCommunity = null,
+    onSuccess,
+}: WaitlistFormProps) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [community, setCommunity] = useState("");

@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   },
   description:
     "A co-parenting and co-habitation platform for single mothers — raising children collectively.",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export const viewport: Viewport = {

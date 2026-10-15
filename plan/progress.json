@@ -746,6 +746,16 @@
         "functions-es-sync"
       ],
       "notes": ""
+    },
+    {
+      "id": "use-brand-logo-and-favicon",
+      "title": "Use brand logo and favicon",
+      "phase": "step-0-launch",
+      "status": "done",
+      "requirements": [],
+      "context": [],
+      "depends_on": [],
+      "notes": ""
     }
   ]
 }

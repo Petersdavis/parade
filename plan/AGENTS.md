@@ -1,4 +1,4 @@
-# AGENTS.md — Parade Plan & Task Collaboration Rules
+# AGENTS.md — Plan & Task Collaboration Rules
 
 This directory contains the shared plan that multiple AI agents collaborate on.
 Read this file in full before touching any plan or task file.

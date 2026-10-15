@@ -1,17 +1,18 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
 import { signOutUser } from "@/lib/auth";
+import logo from "@/images/logo.png";
 
 import styles from "./NavBar.module.css";
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
 ];
 
 export function NavBar() {
@@ -33,7 +34,7 @@ export function NavBar() {
     <header className={styles.header}>
       <nav className={styles.nav} aria-label="Primary">
         <Link href="/" className={styles.brand}>
-          Parade 🐘
+          <Image src={logo} alt="Parade" className={styles.brandImage} priority />
         </Link>
         <ul className={styles.links}>
           {links.map((link) => (
@@ -41,11 +42,6 @@ export function NavBar() {
               <Link href={link.href}>{link.label}</Link>
             </li>
           ))}
-          {!loading && user && !emailVerified ? (
-            <li>
-              <Link href="/verify-email">Verify email</Link>
-            </li>
-          ) : null}
           {!loading && user ? (
             <li>
               <button

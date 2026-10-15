@@ -4,25 +4,37 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  overflow: visible;
 }
 
 .nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 960px;
+  max-width: 1060px;
   margin: 0 auto;
-  padding: 0.875rem 1.25rem;
+  padding: 1.25rem 0.25rem;
+  overflow: visible;
 }
 
 .brand {
-  font-weight: 700;
-  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
   color: var(--color-fg);
+  overflow: visible;
+  padding-block: 0.25rem;
 }
 
 .brand:hover {
   text-decoration: none;
+}
+
+.brandImage {
+  display: block;
+  width: auto;
+  height: 3rem;
+  max-height: none;
+  object-fit: contain;
 }
 
 .links {

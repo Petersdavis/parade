@@ -2,7 +2,9 @@
   --color-bg: #ffffff;
   --color-fg: #1a1a1a;
   --color-muted: #6b7280;
-  --color-primary: #7c3aed;
+  --color-primary: #3f4f6b;
+  --color-secondary: #8da6cf;
+  --color-tertiary: #d9e2f2;
   --color-primary-fg: #ffffff;
   --color-border: #e5e7eb;
   --color-surface: #f9fafb;
@@ -38,6 +40,26 @@ body {
   font-family: var(--font-sans);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2 {
+  color: var(--color-primary);
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 5vw, 4.75rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+h2 {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.05;
+  text-transform: uppercase;
 }
 
 a {

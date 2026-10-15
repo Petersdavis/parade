@@ -6,22 +6,25 @@ import { Button } from "@/components/ui/Button";
 import { canonicalUrl, SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Co-parenting and co-habitation for single mothers in Ontario",
-  description: SITE_DESCRIPTION,
+  title: "It takes a village",
+  description:
+    "Parade connects single mothers through intentional matching, shared housing, and collaborative parenting.",
   alternates: {
     canonical: canonicalUrl("/"),
   },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
-    title: "Parade — co-parent and co-habitate with single mothers in Ontario",
-    description: SITE_DESCRIPTION,
+    title: "Parade — It takes a village. Let's build yours.",
+    description:
+      "Parade connects single mothers through intentional matching, shared housing, and collaborative parenting.",
     url: canonicalUrl("/"),
   },
   twitter: {
     card: "summary_large_image",
-    title: "Parade — co-parent and co-habitate with single mothers in Ontario",
-    description: SITE_DESCRIPTION,
+    title: "Parade — It takes a village. Let's build yours.",
+    description:
+      "Parade connects single mothers through intentional matching, shared housing, and collaborative parenting.",
   },
 };
 
@@ -38,10 +41,10 @@ export default function LandingPage() {
       <LandingHero />
       <HowItWorks />
       <section aria-labelledby="final-cta-heading" className="stack">
-        <h2 id="final-cta-heading">Be first in line</h2>
+        <h2 id="final-cta-heading">Find your village</h2>
         <p>
-          We are opening Parade community by community across Ontario. Join the waitlist to claim
-          your spot and help bring Parade to your area.
+          Parade is opening community by community across Ontario. Join the waitlist to be among
+          the first mothers matched into a supportive home and a collaborative parenting network.
         </p>
         <Button href="/register">Join the waitlist</Button>
       </section>
