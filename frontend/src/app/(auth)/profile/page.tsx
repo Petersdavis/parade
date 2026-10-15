@@ -9,7 +9,7 @@ import formStyles from "@/components/auth/AuthForm.module.css";
 import { CommunityCombobox } from "@/components/marketing/CommunityCombobox";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { fetchUserProfile, saveUserProfile } from "@/lib/auth";
+import { saveUserProfile } from "@/lib/auth";
 import { isCanonicalCommunityId } from "@/lib/ontario-communities";
 import { isValid, validateProfileForm, type FieldErrors } from "@/lib/validation";
 
@@ -38,7 +38,7 @@ export default function ProfilePage() {
 function ProfileForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { user, loading } = useAuth();
+    const { user, loading, profile, profileLoading } = useAuth();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -46,7 +46,6 @@ function ProfileForm() {
     const [errors, setErrors] = useState<FieldErrors>({});
     const [formError, setFormError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
-    const [checking, setChecking] = useState(true);
 
     // Pre-select the community from a referral link, if one was supplied.
     const ref = searchParams.get("ref");
@@ -62,55 +61,29 @@ function ProfileForm() {
     // Pre-fill from the auth account and skip ahead when the profile is already
     // complete (e.g. the user navigates back to this page).
     useEffect(() => {
-        if (loading || !user) {
+        if (loading || profileLoading || !user) {
             return;
         }
 
-        let cancelled = false;
-
-        async function load() {
-            try {
-                const profile = await fetchUserProfile(user!);
-                if (cancelled) {
-                    return;
-                }
-                if (profile?.profileComplete) {
-                    router.replace("/waitlist/leaderboard");
-                    return;
-                }
-                setEmail((current) => current || user!.email || "");
-                if (profile?.firstName) {
-                    setFirstName(profile.firstName);
-                }
-                if (profile?.lastName) {
-                    setLastName(profile.lastName);
-                }
-                if (profile?.community) {
-                    setCommunity(profile.community);
-                } else if (referralCommunity) {
-                    // Pre-select the community from a referral link.
-                    setCommunity((current) => current || referralCommunity);
-                }
-            } catch (error) {
-                console.error("Failed to load user profile", error);
-                if (!cancelled) {
-                    setEmail((current) => current || user!.email || "");
-                    if (referralCommunity) {
-                        setCommunity((current) => current || referralCommunity);
-                    }
-                }
-            } finally {
-                if (!cancelled) {
-                    setChecking(false);
-                }
-            }
+        if (profile?.profileComplete) {
+            router.replace("/waitlist/leaderboard");
+            return;
         }
 
-        void load();
-        return () => {
-            cancelled = true;
-        };
-    }, [loading, user, router, referralCommunity]);
+        setEmail((current) => current || user.email || "");
+        if (profile?.firstName) {
+            setFirstName(profile.firstName);
+        }
+        if (profile?.lastName) {
+            setLastName(profile.lastName);
+        }
+        if (profile?.community) {
+            setCommunity(profile.community);
+        } else if (referralCommunity) {
+            // Pre-select the community from a referral link.
+            setCommunity((current) => current || referralCommunity);
+        }
+    }, [loading, profileLoading, user, profile, router, referralCommunity]);
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -142,7 +115,7 @@ function ProfileForm() {
         }
     }
 
-    if (loading || checking) {
+    if (loading || profileLoading) {
         return (
             <div className="stack">
                 <Card>

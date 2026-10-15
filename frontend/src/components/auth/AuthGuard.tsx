@@ -1,10 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
-import { fetchUserProfile, type UserProfile } from "@/lib/auth";
 
 /** Where to send a signed-out visitor. */
 export const DEFAULT_SIGNED_OUT_REDIRECT = "/";
@@ -27,7 +26,7 @@ export interface AuthGuardRenderProps {
    * The `users/{uid}` profile document, or null when it was not loaded (i.e.
    * `requireProfileComplete` was not set) or does not exist.
    */
-  profile: UserProfile | null;
+  profile: ReturnType<typeof useAuth>["profile"];
 }
 
 interface AuthGuardProps {
@@ -93,45 +92,8 @@ export function AuthGuard({
   unverifiedRedirect = DEFAULT_UNVERIFIED_REDIRECT,
   fallback = null,
 }: AuthGuardProps) {
-  const { user, loading, emailVerified } = useAuth();
+  const { user, loading, emailVerified, profile, profileLoading } = useAuth();
   const router = useRouter();
-
-  // Profile state is only fetched when a completed profile is required.
-  const [profileLoading, setProfileLoading] = useState(requireProfileComplete);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-
-  // Load the profile document once the user is known.
-  useEffect(() => {
-    if (!requireProfileComplete || loading || !user) {
-      return;
-    }
-
-    let cancelled = false;
-    setProfileLoading(true);
-
-    async function load() {
-      try {
-        const loaded = await fetchUserProfile(user!);
-        if (!cancelled) {
-          setProfile(loaded);
-        }
-      } catch (error) {
-        console.error("Failed to load user profile for guard", error);
-        if (!cancelled) {
-          setProfile(null);
-        }
-      } finally {
-        if (!cancelled) {
-          setProfileLoading(false);
-        }
-      }
-    }
-
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [requireProfileComplete, loading, user]);
 
   const profileComplete = profile?.profileComplete === true;
 

@@ -4,11 +4,14 @@
 <svg
    version="1.1"
    id="svg1"
-   width="1002.6569"
-   height="451.76935"
-   viewBox="0 0 1002.6569 451.76935"
+   width="669"
+   height="669"
+   viewBox="0 0 668.99999 669"
    sodipodi:docname="fav_icon.svg"
    inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   inkscape:export-filename="../../public/assets/fav_icon.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -36,8 +39,8 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="0.75911458"
-     inkscape:cx="488.06861"
-     inkscape:cy="153.46827"
+     inkscape:cx="310.22985"
+     inkscape:cy="274.66209"
      inkscape:window-width="1853"
      inkscape:window-height="1011"
      inkscape:window-x="0"
@@ -48,7 +51,7 @@
      inkscape:groupmode="layer"
      inkscape:label="Image"
      id="g1"
-     transform="translate(-1612.0498,-145.03436)">
+     transform="translate(-1778.8782,-36.419052)">
     <circle
        style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#3c4c63;stroke-width:10.1362;stroke-dasharray:none;stroke-opacity:1"
        id="path46-3"

@@ -14,9 +14,11 @@ import type { User } from "firebase/auth";
 
 import {
   reloadUser as reloadFirebaseUser,
+  fetchUserProfile,
   subscribeToAuthState,
   subscribeToIdTokenChanges,
 } from "@/lib/auth";
+import type { UserProfile } from "@/lib/auth";
 
 /** How often to re-check verification while a signed-in user is unverified. */
 const VERIFICATION_POLL_INTERVAL_MS = 5_000;
@@ -28,6 +30,10 @@ interface AuthContextValue {
   loading: boolean;
   /** True when the signed-in user's email address has been verified. */
   emailVerified: boolean;
+  /** The signed-in user's canonical profile, if loaded. */
+  profile: UserProfile | null;
+  /** True while the canonical profile is being fetched. */
+  profileLoading: boolean;
   /**
    * Reload the current user from Firebase and refresh the context.
    *
@@ -43,6 +49,8 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   loading: true,
   emailVerified: false,
+  profile: null,
+  profileLoading: false,
   reloadUser: async () => null,
 });
 
@@ -61,6 +69,8 @@ const AuthContext = createContext<AuthContextValue>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
 
   // Keep a ref to the latest user so the polling effect can read it without
   // re-subscribing on every change.
@@ -83,6 +93,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setProfile(null);
+      setProfileLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setProfileLoading(true);
+    const currentUser = user;
+
+    async function loadProfile() {
+      try {
+        const loaded = await fetchUserProfile(currentUser);
+        if (!cancelled) {
+          setProfile(loaded);
+        }
+      } catch (error) {
+        console.error("Failed to load user profile", error);
+        if (!cancelled) {
+          setProfile(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setProfileLoading(false);
+        }
+      }
+    }
+
+    void loadProfile();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const reloadUser = useCallback(async (): Promise<User | null> => {
     const current = userRef.current;
@@ -130,8 +175,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, emailVerified]);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ user, loading, emailVerified, reloadUser }),
-    [user, loading, emailVerified, reloadUser],
+    () => ({ user, loading, emailVerified, profile, profileLoading, reloadUser }),
+    [user, loading, emailVerified, profile, profileLoading, reloadUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
